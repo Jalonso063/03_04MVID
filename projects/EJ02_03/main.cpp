@@ -73,15 +73,16 @@ uint32_t createProgram() {
 
 uint32_t createVertexData(uint32_t* VBO, uint32_t* EBO) {
     float vertices[] = {
-        0.5f, 0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f,
         -0.5f, 0.5f, 0.0f,
+        -1.0f, -0.5f, 0.0f,
+		0.0f, -0.5f, 0.0f,
+        1.0f, -0.5f, 0.0f,
+		0.5f, 0.5f, 0.0f,
     };
 
     uint32_t indices[] = {
-        0, 3, 1,
-        1, 3, 2
+        0, 1, 2,
+        2, 3, 4
     };
 
     uint32_t VAO;
