@@ -73,15 +73,22 @@ uint32_t createProgram() {
 
 uint32_t createVertexData(uint32_t* VBO, uint32_t* EBO) {
     float vertices[] = {
-        0.5f, 0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f,
-        -0.5f, 0.5f, 0.0f,
+        0.0f, 0.0f, 0.0f,
+		-0.5f, 1.0f, 0.0f,
+        -1.0f, 0.0f, 0.0f,
+        -0.5f, -1.0f, 0.0f,
+		0.5f, -1.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		0.5f, 1.0f, 0.0f,
     };
 
     uint32_t indices[] = {
-        0, 3, 1,
-        1, 3, 2
+        0, 1, 2,
+		0, 2, 3,
+		0, 3, 4,
+		0, 4, 5,
+		0, 5, 6,
+		0, 6, 1
     };
 
     uint32_t VAO;
@@ -115,7 +122,7 @@ void render(uint32_t VAO, uint32_t program) {
 
     glUseProgram(program);
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, nullptr);
 }
 
 int main(int, char*[]) {
