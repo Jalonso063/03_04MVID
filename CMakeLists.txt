@@ -14,14 +14,27 @@ include(cmake/compiler.cmake)
 # Engine Library
 #****************************************************
 #Engine Source Files
-set(ENGINE_SRC_FILES
-	${CMAKE_CURRENT_LIST_DIR}/src/engine/shader.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/src/engine/window.cpp
-	${CMAKE_CURRENT_LIST_DIR}/include/engine/input.hpp
-	${CMAKE_CURRENT_LIST_DIR}/include/engine/shader.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/include/engine/window.hpp)
 
-add_library(EngineLib STATIC ${ENGINE_SRC_FILES} ${DEPS_SRC_FILES_COMMON})
+set(ENGINE_SRC_FILES
+    ${CMAKE_CURRENT_LIST_DIR}/src/engine/deps.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/engine/shader.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/engine/texture.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/engine/window.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/engine/geometry/geometry.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/engine/geometry/quad.cpp)
+
+set(ENGINE_HEADER_FILES
+    ${CMAKE_CURRENT_LIST_DIR}/include/engine/input.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/engine/shader.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/engine/texture.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/engine/window.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/engine/geometry/geometry.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/engine/geometry/quad.hpp)
+
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src/engine/ PREFIX "Source Files" FILES ${ENGINE_SRC_FILES})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/include/engine PREFIX "Header Files" FILES ${ENGINE_HEADER_FILES})
+
+add_library(EngineLib STATIC ${ENGINE_SRC_FILES} ${ENGINE_HEADER_FILES} ${DEPS_SRC_FILES_COMMON})
 
 target_include_directories(EngineLib PRIVATE ${INCLUDE_PATHS})
 target_compile_definitions(EngineLib PRIVATE -D_GLFW_USE_OPENGL=1)
@@ -34,12 +47,12 @@ configure_compiler(EngineLib)
 # Projects
 #****************************************************
 # List of projects
-set(PROJECT_LIST AG01 AG02 AG03 AG04 AG05_01 AG05_02 AG06 AG07_01 AG07_02 AG08_01
+set(PROJECT_LIST AG01 AG02 AG03 AG04 AG05 AG06 AG07_01 AG07_02 AG08_01
     AG08_02 AG08_03 AG08_04 AG08_05 AG09 AG10_01 AG10_02 AG10_03 AG11 AG12 AG13
     EJ02_01 EJ02_02 EJ02_03 EJ02_04 EJ02_05 EJ02_06
     EJ03_01 EJ03_02 EJ03_03 EJ03_04
     EJ04_01 EJ04_02 EJ04_03 EJ04_04 EJ04_05
-    EJ05_01 EJ05_02 EJ05_03 EJ05_04 EJ05_05 EJ05_06 EJ05_07
+    EJ05_01 EJ05_02 EJ05_03 EJ05_04 EJ05_05
     EJ06_01 EJ06_02 EJ06_03 EJ06_04 EJ06_05 EJ06_06
     EJ07_01 EJ07_02 EJ07_03 EJ07_04 EJ07_05
     EJ08_01 EJ08_02 EJ08_03 EJ08_04
