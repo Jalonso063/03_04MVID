@@ -70,7 +70,7 @@ int main(int, char* []) {
 
     uint32_t VBO, EBO;
     const uint32_t VAO = createVertexData(&VBO, &EBO);
-    const Shader shader("../projects/AG03/vertex.vs", "../projects/AG03/fragment.fs");
+    const Shader shader("../projects/EJ03_01/vertex.vs", "../projects/EJ03_01/fragment.fs");
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
