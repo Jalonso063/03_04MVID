@@ -6,6 +6,8 @@
 
 #include <iostream>
 
+#define PI 3.1415926535897932384626433832795
+
 void handleInput() {
     std::vector<std::pair<int, int>> keys = Input::instance()->getKeys();
     for(auto& key : keys) {
@@ -71,18 +73,41 @@ uint32_t createProgram() {
     return program;
 }
 
-uint32_t createVertexData(uint32_t* VBO, uint32_t* EBO) {
-    float vertices[] = {
-        0.5f, 0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f,
-        -0.5f, 0.5f, 0.0f,
-    };
+void calculateVertex(float *vertexArray)
+{	
+	//vertice central
+	vertexArray[0] = 0.0f, vertexArray[1] = 0.0f, vertexArray[2] = 0.0f;
 
-    uint32_t indices[] = {
-        0, 3, 1,
-        1, 3, 2
-    };
+	int arrayIndex = 3;
+	float z = 0.0f;
+
+	//cada vertice se encuentra a un angulo de pi/3 del anterior con radio 1
+	for (float angleIndex = PI / 3; angleIndex <= 2 * PI; angleIndex += PI / 3)
+	{
+		float x = cos(angleIndex);
+		float y = sin(angleIndex);
+		
+		vertexArray[arrayIndex] = x;
+		vertexArray[arrayIndex + 1] = y;
+		vertexArray[arrayIndex + 2] = z;
+
+		arrayIndex += 3;
+	}
+}
+
+uint32_t createVertexData(uint32_t* VBO, uint32_t* EBO) {	
+
+	float vertices[21];
+	calculateVertex(&vertices[0]);
+
+	uint32_t indices[] = {
+		0, 1, 2,
+		0, 2, 3,
+		0, 3, 4,
+		0, 4, 5,
+		0, 5, 6,
+		0, 6, 1
+	};
 
     uint32_t VAO;
     glGenVertexArrays(1, &VAO);
@@ -115,7 +140,7 @@ void render(uint32_t VAO, uint32_t program) {
 
     glUseProgram(program);
     glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, nullptr);
 }
 
 int main(int, char*[]) {
