@@ -15,9 +15,9 @@ void handleInput() {
 
 uint32_t createVertexData(uint32_t* VBO, uint32_t* EBO) {
     float vertices[] = {
-        0.5f, -0.5f, 0.0f,      1.0f, 0.0f, 0.0f,
-        -0.5f, -0.5f, 0.0f,     0.0f, 1.0f, 0.0f,
-        0.0f, 0.5f, 0.0f,       0.0f, 0.0f, 1.0f
+        0.5f, -0.5f, 0.0f,      
+        -0.5f, -0.5f, 0.0f,     
+        0.0f, 0.5f, 0.0f
     };
 
     uint32_t indices[] = {
@@ -37,11 +37,8 @@ uint32_t createVertexData(uint32_t* VBO, uint32_t* EBO) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
     glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -57,7 +54,6 @@ void render(uint32_t VAO, const Shader& shader) {
     glClear(GL_COLOR_BUFFER_BIT);
 
     shader.use();
-    shader.set("addColor", 0.2f, 0.0f, 0.0f);
 
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
@@ -70,7 +66,7 @@ int main(int, char* []) {
 
     uint32_t VBO, EBO;
     const uint32_t VAO = createVertexData(&VBO, &EBO);
-    const Shader shader("../projects/AG03/vertex.vs", "../projects/AG03/fragment.fs");
+    const Shader shader("../projects/EJ03_04/vertex.vs", "../projects/EJ03_04/fragment.fs");
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 

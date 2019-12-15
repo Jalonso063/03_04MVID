@@ -1,0 +1,19 @@
+Cuando mandamos al fragment shader la posición del vértice, este representará en los colores los valores que obtiene de dichas posiciones.
+
+En este caso para los siguientes vértices : 
+
+	0.5f, -0.5f, 0.0f, -- vértice inferior derecha  (0)    
+        -0.5f, -0.5f, 0.0f, -- vértice inferior izquierda  (1)
+        0.0f, 0.5f, 0.0f   -- vértice superior (2)
+
+El frágment shader recibe en los valores de x,y,z 0.5 en la x, el cual corresponde al rojo, por lo tanto asignará ese valor al rojo, -0.5 
+en la y, el cual corresponde al verde, en este caso se asignará el valor 0 al ser un valor negativo y de la misma manera para el valor z 
+que corresponde al azul. 
+
+Por lo tanto, según estas coordenadas, el triángulo se formará con un valor rojo de intensidad media en el vértice inferior derecha,
+un color verde de intensidad medio en el vértice superior y un negro intenso en el vértice inferior izquierda.
+
+Si nos fijamos, el negro es el color que más area cubre del triángulo. Esto se da porque la interpolación coge los valores de los vértices
+y se realiza para cada texel en base a la distancia del texel y el valor del color de los vértices comparados. Por lo tanto, cuanto 
+más nos acercamos al vértice 0 el color es cada vez más rojo, pero este color pierde fuerza unos pixeles de distancia antes del centro del
+triángulo ya que el valor del vértice 2 es más intenso que el del resto.
