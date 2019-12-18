@@ -84,7 +84,7 @@ uint32_t createTexture(const char* path) {
     return texture;
 }
 
-void render(uint32_t VAO, const Shader& shader, uint32_t tex1, uint32_t tex2) {
+void render(uint32_t VAO, const Shader& shader, uint32_t tex1) {
     glClear(GL_COLOR_BUFFER_BIT);
 
     shader.use();
@@ -93,11 +93,7 @@ void render(uint32_t VAO, const Shader& shader, uint32_t tex1, uint32_t tex2) {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex1);
 
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, tex2);
-
     shader.set("tex_1", 0);
-    shader.set("tex_2", 1);
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 }
@@ -111,17 +107,16 @@ int main(int, char* []) {
 
     uint32_t VBO, EBO;
     const uint32_t VAO = createVertexData(&VBO, &EBO);
-    const Shader shader("../projects/AG04/vertex.vs", "../projects/AG04/fragment.fs");
+    const Shader shader("../projects/EJ04_02/vertex.vs", "../projects/EJ04_02/fragment.fs");
 
     uint32_t tex1 = createTexture("../assets/textures/bricks_arrow.jpg");
-    uint32_t tex2 = createTexture("../assets/textures/blue_blocks.jpg");
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
     while (window->alive()) {
         handleInput();
-        render(VAO, shader, tex1, tex2);
+        render(VAO, shader, tex1);
         window->frame();
     }
 
@@ -130,7 +125,6 @@ int main(int, char* []) {
     glDeleteBuffers(1, &EBO);
 
     glDeleteTextures(1, &tex1);
-    glDeleteTextures(1, &tex2);
 
     return 0;
 }
