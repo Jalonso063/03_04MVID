@@ -18,15 +18,24 @@ void handleInput() {
 
 uint32_t createVertexData(uint32_t* VBO, uint32_t* EBO) {
     float vertices[] = {
-        0.5f, 0.5f, 0.0f,      1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
-        0.5f, -0.5f, 0.0f,     0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
-        -0.5f, -0.5f, 0.0f,    0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
-        -0.5f, 0.5f, 0.0f,     1.0f, 1.0f, 0.0f,   0.0f, 1.0f,
+        0.0f, 0.5f, 0.0f,      1.0f, 0.0f, 0.0f,   0.1f, 0.1f, // centro arriba
+        -1.0f, 0.5f, 0.0f,     0.0f, 1.0f, 0.0f,   0.0f, 0.1f, // izda arriba
+        -1.0f, -0.5f, 0.0f,    0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // izda abajo
+        0.0f, -0.5f, 0.0f,     1.0f, 1.0f, 0.0f,   0.1f, 0.0f, // centro abajo
+
+
+        0.0f, 0.5f, 0.0f,      1.0f, 0.0f, 0.0f,   0.0f, 0.1f, // centro arriba    
+        0.0f, -0.5f, 0.0f,     1.0f, 1.0f, 0.0f,   0.0f, 0.0f, // centro abajo
+        1.0f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f,   0.1f, 0.0f, // dcha abajo
+        1.0f, 0.5f, 0.0f,      0.0f, 1.0f, 0.0f,   0.1f, 0.1f, // dcha arriba
     };
 
     uint32_t indices[] = {
-        0, 3, 1,
-        1, 3, 2
+        0, 1, 3,
+        3, 1, 2,
+
+        4, 5, 6,
+        4, 6, 7
     };
 
     uint32_t VAO;
@@ -60,7 +69,7 @@ uint32_t createVertexData(uint32_t* VBO, uint32_t* EBO) {
     return VAO;
 }
 
-uint32_t createTexture(const char* path) {
+uint32_t createTexture(const char* path, GLint filter) {
     uint32_t texture;
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -68,8 +77,8 @@ uint32_t createTexture(const char* path) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
 
     int width, height, nChannels;
     unsigned char* data = stbi_load(path, &width, &height, &nChannels, 0);
@@ -93,11 +102,15 @@ void render(uint32_t VAO, const Shader& shader, uint32_t tex1, uint32_t tex2) {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex1);
 
+    shader.set("tex", 0);
+
+    glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, nullptr);
+
+
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, tex2);
 
-    shader.set("tex_1", 0);
-    shader.set("tex_2", 1);
+    shader.set("tex", 1);
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 }
@@ -111,10 +124,10 @@ int main(int, char* []) {
 
     uint32_t VBO, EBO;
     const uint32_t VAO = createVertexData(&VBO, &EBO);
-    const Shader shader("../projects/AG04/vertex.vs", "../projects/AG04/fragment.fs");
+    const Shader shader("../projects/EJ04_04/vertex.vs", "../projects/EJ04_04/fragment.fs");
 
-    uint32_t tex1 = createTexture("../assets/textures/bricks_arrow.jpg");
-    uint32_t tex2 = createTexture("../assets/textures/blue_blocks.jpg");
+    uint32_t tex1 = createTexture("../assets/textures/bricks_arrow.jpg", GL_LINEAR);
+    uint32_t tex2 = createTexture("../assets/textures/bricks_arrow.jpg", GL_NEAREST);
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
