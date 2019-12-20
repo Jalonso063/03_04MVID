@@ -1,28 +1,33 @@
 #include <glad/glad.h>
 
-#include "engine/input.hpp"
 #include "engine/window.hpp"
 #include "engine/shader.hpp"
 
-#include <iostream>
-
 #include "engine/texture.hpp"
-#include "engine/geometry/quad.hpp"
+#include "engine/geometry/cube.hpp"
+#include <glm/gtc/matrix_transform.hpp>
+#include <GLFW/glfw3.h>
 
-void handleInput() {
-    std::vector<std::pair<int, int>> keys = Input::instance()->getKeys();
-    for (auto& key : keys) {
-        std::cout << key.first << " - " << key.second << std::endl;
-    }
-}
+void handleInput() {/*Intentionally Left BLank*/ }
 
-void render(const Geometry& geom, const Shader& shader, Texture& tex1, Texture& tex2) {
+void render(const Geometry& geom, const Shader& shader, Texture& tex) {
     glClear(GL_COLOR_BUFFER_BIT);
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::rotate(model, static_cast<float>(glfwGetTime()) * glm::radians(20.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+
+    glm::mat4 view = glm::mat4(1.0f);
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+    glm::mat4 proj = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
 
     shader.use();
 
-    tex1.use(shader, "tex_1", 0);
-    tex2.use(shader, "tex_2", 1);
+    tex.use(shader, "tex", 0);
+
+    shader.set("model", model);
+    shader.set("view", view);
+    shader.set("proj", proj);  //TODO const mat4
 
     geom.render();
 }
@@ -33,17 +38,16 @@ int main(int, char* []) {
     glClearColor(0.0f, 0.3f, 0.6f, 1.0f);
 
     const Shader shader("../projects/AG05/vertex.vs", "../projects/AG05/fragment.fs");
-    const Quad quad(1.0f);
+    const Cube cube(1.0f);
 
-    Texture tex1("../assets/textures/bricks_arrow.jpg", Texture::Format::RGB);
-    Texture tex2("../assets/textures/blue_blocks.jpg", Texture::Format::RGB);
+    Texture tex("../assets/textures/blue_blocks.jpg", Texture::Format::RGB);
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
     while (window->alive()) {
         handleInput();
-        render(quad, shader, tex1, tex2);
+        render(cube, shader, tex);
         window->frame();
     }
 

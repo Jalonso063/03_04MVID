@@ -8,8 +8,7 @@ class Quad final: public Geometry {
         Quad() = delete;
         explicit Quad(float size);
 
-    protected:
+    private:
         float _size;
-
 };
 #endif

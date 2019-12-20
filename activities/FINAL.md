@@ -1,5 +1,7 @@
 # Actividad Final
 
+Podeis hacer propuestas para la practica final que tendreis que hacer con vuestro propio motor, yo aporto dos de ellas. Tambien podeis votar por la que más os apetezca realizar. A la vuelta de Navidades revisaremos y decidiremos.
+
 ## Requisitos
 
 Debe ser un juego con un gameplay sencillo que permita centrarse en implementar y demostrar que el motor desarrollado durante la asignatura es competente. Asimismo debe ser lo suficientemente amplio para dar la opción a mostrar todas las técnicas gráficas aprendidas (modelos de iluminación, mapas, luces, carga de modelos, normal mapping, fbos, sombras, ...).

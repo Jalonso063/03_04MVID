@@ -1,17 +1,10 @@
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
-#include "engine/input.hpp"
 #include "engine/window.hpp"
 
 #include <iostream>
 
-void handleInput() {
-    std::vector<std::pair<int, int>> keys = Input::instance()->getKeys();
-    for(auto& key : keys) {
-        std::cout << key.first << " - " << key.second << std::endl;
-    }
-}
+void handleInput() {/*Intentionally Left BLank*/}
 
 bool checkShader(uint32_t shader) {
     int success;
