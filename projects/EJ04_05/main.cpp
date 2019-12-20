@@ -14,20 +14,16 @@ float interpolation = 0.0f;
 float interpolationIndex = 0.0f;
 
 void handleInput() {
-    std::vector<std::pair<int, int>> keys = Input::instance()->getKeys();
-    for (auto& key : keys) {
-        std::cout << key.first << " - " << key.second << " - " << interpolation << std::endl;
 
-        if (key.second == GLFW_PRESS)
-        {
-            if (key.first == GLFW_KEY_LEFT) // flecha izquierda
-                interpolationIndex -= 0.2f;
+    Input* input = Input::instance();
+    
+    if (input->isKeyPressed(GLFW_KEY_LEFT)) // flecha izquierda
+        interpolationIndex -= 0.05f;
 
-            else if (key.first == GLFW_KEY_RIGHT) // flecha derecha
-                interpolationIndex += 0.2f;
-        }
-        interpolation = (sin(interpolationIndex) + 1) / 2; // rango entre 0 y 1
-    }
+    if (input->isKeyPressed(GLFW_KEY_RIGHT)) // flecha derecha
+        interpolationIndex += 0.05f;
+
+    interpolation = (sin(interpolationIndex) + 1) / 2; // rango entre 0 y 1
 }
 
 uint32_t createVertexData(uint32_t* VBO, uint32_t* EBO) {
