@@ -1,7 +1,8 @@
 #ifndef __INPUT_H__
 #define __INPUT_H__
 
-#include <vector>
+#include <functional>
+#include "engine/window.hpp"
 
 class Input {
 public:
@@ -10,28 +11,38 @@ public:
         return &i;
     }
 
-    void addKey(int key, int action) {
-        keys_.emplace_back(key, action);
+    static bool isKeyPressed(int key) {
+        return Window::instance()->keyPressed(key);
     }
 
-    void clear() {
-        keys_.clear();
+    void setKeyPressedCallback(const std::function<void(int, int)>& f) {
+        _keyPressedCallback = f;
     }
 
-    const std::vector<std::pair<int, int>>& getKeys() const {
-        return keys_;
+    void setMouseMoveCallback(const std::function<void(float, float)>& f) {
+        _mouseMoveCallback = f;
+    }
+    void setScrollMoveCallback(const std::function<void(float, float)>& f) {
+        _scrollMoveCallback = f;
+    }
+
+    void keyPressed(int key, int action) const {
+        if (_keyPressedCallback) _keyPressedCallback(key, action);
+    }
+
+    void mouseMoved(float x, float y) const {
+        if (_mouseMoveCallback) _mouseMoveCallback(x, y);
+    }
+
+    void scrollMove(float x, float y) const {
+        if (_scrollMoveCallback) _scrollMoveCallback(x, y);
     }
 
 private:
-    Input() = default;
-    ~Input() = default;
+    std::function<void(int, int)> _keyPressedCallback = nullptr;
+    std::function<void(float, float)> _mouseMoveCallback = nullptr;
+    std::function<void(float, float)> _scrollMoveCallback = nullptr;
 
-    Input(const Input&) = default;
-    Input(Input&&) = default;
-    Input& operator=(const Input&) = default;
-    Input& operator=(Input&&) = default;
-
-    std::vector<std::pair<int, int>> keys_;
 };
 
 #endif

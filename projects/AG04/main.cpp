@@ -1,6 +1,5 @@
 #include <glad/glad.h>
 
-#include "engine/input.hpp"
 #include "engine/window.hpp"
 #include "engine/shader.hpp"
 
@@ -9,12 +8,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-void handleInput() {
-    std::vector<std::pair<int, int>> keys = Input::instance()->getKeys();
-    for (auto& key : keys) {
-        std::cout << key.first << " - " << key.second << std::endl;
-    }
-}
+void handleInput() {/*Intentionally Left BLank*/ }
 
 uint32_t createVertexData(uint32_t* VBO, uint32_t* EBO) {
     float vertices[] = {

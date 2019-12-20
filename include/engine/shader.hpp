@@ -31,11 +31,12 @@ class Shader {
         void set(const char* name, float value1, float value2) const;
         void set(const char* name, float value1, float value2, float value3) const;
         void set(const char* name, float value1, float value2, float value3, float value4) const;
-        void set(const char* name, glm::vec2& value) const;
-        void set(const char* name, glm::vec3& value) const;
-        void set(const char* name, glm::vec4& value) const;
-        void set(const char* name, glm::mat3& value) const;
-        void set(const char* name, glm::mat4& value) const;
+        void set(const char* name, const glm::vec2& value) const;
+        void set(const char* name, const glm::vec3& value) const;
+        void set(const char* name, const glm::vec4& value) const;
+        void set(const char* name, const glm::mat2& value) const;
+        void set(const char* name, const glm::mat3& value) const;
+        void set(const char* name, const glm::mat4& value) const;
 
     private:
         static void loadShader(const char* path, std::string* code);

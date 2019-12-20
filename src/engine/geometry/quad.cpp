@@ -1,7 +1,8 @@
 #include "engine/geometry/quad.hpp"
 
 Quad::Quad(float size) : _size(size) {
-    _nVerts = 1 * 2 * 3;  //1 face * 2 triangles * 3 vertices
+    _nVertices = 1 * 2 * 3;  //1 face * 2 triangles * 3 vertices
+    _nElements = _nVertices;
 
     const float half = size / 2.0f;
 

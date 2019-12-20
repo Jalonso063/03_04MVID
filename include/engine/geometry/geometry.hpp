@@ -1,7 +1,7 @@
 #ifndef __GEOMETRY_H__
 #define __GEOMETRY_H__ 1
+
 #include <cstdint>
-#include <glad/glad.h>
 
 //Attributes
 //0 - positions
@@ -11,11 +11,7 @@
 class Geometry {
     public:
         Geometry() = default;
-
-        virtual ~Geometry() {
-            glDeleteBuffers(4, _VBO);
-            glDeleteVertexArrays(1, &_VAO);
-        }
+        virtual ~Geometry();
 
         Geometry(const Geometry&) = default;
         Geometry& operator=(const Geometry&) = default;
@@ -31,7 +27,8 @@ class Geometry {
     protected:
         uint32_t _VAO = 0;
         uint32_t _VBO[4] { 0,0,0,0 };
-        uint32_t _nVerts = 0;
+        uint32_t _nVertices = 0;
+        uint32_t _nElements = 0;
 
 };
 #endif
