@@ -8,11 +8,25 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#include <GLFW\glfw3.h>
+
+float interpolation = 0.0f;
+float interpolationIndex = 0.0f;
 
 void handleInput() {
     std::vector<std::pair<int, int>> keys = Input::instance()->getKeys();
     for (auto& key : keys) {
-        std::cout << key.first << " - " << key.second << std::endl;
+        std::cout << key.first << " - " << key.second << " - " << interpolation << std::endl;
+
+        if (key.second == GLFW_PRESS)
+        {
+            if (key.first == GLFW_KEY_LEFT) // flecha izquierda
+                interpolationIndex -= 0.2f;
+
+            else if (key.first == GLFW_KEY_RIGHT) // flecha derecha
+                interpolationIndex += 0.2f;
+        }
+        interpolation = (sin(interpolationIndex) + 1) / 2; // rango entre 0 y 1
     }
 }
 
@@ -98,6 +112,7 @@ void render(uint32_t VAO, const Shader& shader, uint32_t tex1, uint32_t tex2) {
 
     shader.set("tex_1", 0);
     shader.set("tex_2", 1);
+    shader.set("interpolacion", interpolation);
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 }
@@ -111,7 +126,7 @@ int main(int, char* []) {
 
     uint32_t VBO, EBO;
     const uint32_t VAO = createVertexData(&VBO, &EBO);
-    const Shader shader("../projects/AG04/vertex.vs", "../projects/AG04/fragment.fs");
+    const Shader shader("../projects/EJ04_05/vertex.vs", "../projects/EJ04_05/fragment.fs");
 
     uint32_t tex1 = createTexture("../assets/textures/bricks_arrow.jpg");
     uint32_t tex2 = createTexture("../assets/textures/blue_blocks.jpg");
