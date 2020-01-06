@@ -6,7 +6,7 @@
 
 Implementar 6 ejercicios complementarios a AG02, basándose en la implementación de dicha AG02 vista en clase realizar:
 
-- EJ02.01 - Pintar dos triángulos, uno al lado del otro (sin formar un quad, de esta forma " /\/\ "), usando glDrawArrays, añadiendo más vértices a los datos (usando un solo VBO).
+- EJ02.01 - Pintar dos triángulos, uno al lado del otro (sin formar un quad, de esta forma " /\\/\ "), usando glDrawArrays, añadiendo más vértices a los datos (usando un solo VBO).
 - EJ02.02 - Pintar los dos mismos triángulos usando dos VAOs y VBOs diferentes para sus datos.
 - EJ02.03 - Pintar los dos mismos triángulos usando un solo VAO, VBO y un EBO.
 - EJ02.04 - Crear dos programs que pinten los triángulos del ejercicio anterior, que usen el mismo shader de vértices, pero usen un shader de fragmentos distinto para pintar cada triángulo, uno de cada color.

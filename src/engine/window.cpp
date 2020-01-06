@@ -85,3 +85,13 @@ void Window::setCaptureMode(bool toggle) const {
         glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
 }
+
+void Window::setHeight(uint32_t height) {
+    _height = height;
+    glfwSetWindowSize(_window, _width, _height);
+}
+
+void Window::setWidth(uint32_t width) {
+    _width = width;
+    glfwSetWindowSize(_window, _width, _height);
+}
