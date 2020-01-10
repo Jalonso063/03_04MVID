@@ -40,7 +40,7 @@ int main(int, char* []) {
     const Shader shader("../projects/EJ05_02/vertex.vs", "../projects/EJ05_02/fragment.fs");
     const Cube cube(1.0f);
 
-    Texture tex("../assets/textures/blue_blocks.jpg", Texture::Format::RGB);
+    Texture tex("../assets/textures/cube_uv_b.jpg", Texture::Format::RGB);
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
