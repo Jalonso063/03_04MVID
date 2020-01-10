@@ -7,6 +7,7 @@ class Quad final: public Geometry {
     public:
         Quad() = delete;
         explicit Quad(float size);
+        explicit Quad(float width, float depth);
 
     private:
         float _size;
