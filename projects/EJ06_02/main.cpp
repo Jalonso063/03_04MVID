@@ -77,7 +77,7 @@ void render(const Geometry& geom, const Shader& shader, Texture& tex) {
     tex.use(shader, "tex", 0);
 
     shader.set("model", model);
-    shader.set("view", camera.getViewMatrix());
+    shader.set("view", camera.lookAt());
     shader.set("proj", proj);  //TODO const mat4
 
     geom.render();
