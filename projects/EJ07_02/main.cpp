@@ -96,12 +96,24 @@ void render(const Geometry& object, const Geometry& light, const Shader& s_phong
     s_phong.set("objectColor", glm::vec3(0.6f, 0.5f, 0.2f));
     s_phong.set("lightColor", lightColor);
 
+    /*
+    cuanto mayor sea el valor de la luz ambiental, mas luz se emitira en toda la esfera, lo que hace que el valor del resto de luces
+    se vea reducido hasta el punto en el que solo se vea una esfera blanca.
+    */
     s_phong.set("ambientStrength", 0.2f);
     s_phong.set("lightPos", lightPos);
 
     s_phong.set("viewPos", camera.getPosition());
-    s_phong.set("shininess", 64);
-    s_phong.set("specularStrength", 0.6f);
+    /*
+    al aumentar el valor de shininess vemos como se intensifica el valor del  foco de la luz, es decir el punto donde la luz golpea con
+    la esfera se vuelve mas intenso
+    */
+    s_phong.set("shininess", 1000);
+    /*
+    cuanto mas grande sea la intensidad de la luz specular, parecera que el objeto al que le llega la luz es mas reflectante y brillante, como una
+    bola de billar.
+    */
+    s_phong.set("specularStrength", 150.0f);
 
     object.render();
 }
