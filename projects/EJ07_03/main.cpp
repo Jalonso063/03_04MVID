@@ -90,16 +90,20 @@ void render(const Geometry& object, const Geometry& light, const Shader& s_phong
     s_phong.set("view", view);
     s_phong.set("proj", proj);
 
-    glm::mat3 normalMat = glm::inverse(glm::transpose(glm::mat3(model)));
+    glm::mat3 viewSpace = view * model;
+    glm::vec3 lightPosView = view * glm::vec4(lightPos, 1.0f);
+    glm::vec3 cameraPosView = view * glm::vec4(camera.getPosition(), 1.0f);
+
+    glm::mat3 normalMat = glm::inverse(glm::transpose(viewSpace));
     s_phong.set("normalMat", normalMat);
 
     s_phong.set("objectColor", glm::vec3(0.6f, 0.5f, 0.2f));
     s_phong.set("lightColor", lightColor);
 
     s_phong.set("ambientStrength", 0.2f);
-    s_phong.set("lightPos", lightPos);
+    s_phong.set("lightPos", lightPosView);
 
-    s_phong.set("viewPos", camera.getPosition());
+    s_phong.set("viewPos", cameraPosView);
     s_phong.set("shininess", 64);
     s_phong.set("specularStrength", 0.6f);
 
