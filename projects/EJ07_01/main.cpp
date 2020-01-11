@@ -17,6 +17,7 @@ glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 
 float lastFrame = 0.0f;
 float lastX, lastY;
+float speed = 70.0f;
 bool firstMouse = true;
 
 void handleInput(float dt) {
@@ -106,6 +107,13 @@ void render(const Geometry& object, const Geometry& light, const Shader& s_phong
     object.render();
 }
 
+void moveLight(float dt)
+{
+    float angle = glm::radians(speed * dt);
+    lightPos.x = lightPos.x * cos(angle) - lightPos.z * sin(angle);
+    lightPos.z = lightPos.x * sin(angle) + lightPos.z * cos(angle);
+}
+
 int main(int, char* []) {
     Window* window = Window::instance();
 
@@ -134,6 +142,7 @@ int main(int, char* []) {
 
         handleInput(deltaTime);
         render(sphere, sphere, s_phong, s_light);
+        moveLight(deltaTime);
         window->frame();
     }
 
