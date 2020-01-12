@@ -65,7 +65,7 @@ void onScrollMoved(float x, float y) {
     camera.handleMouseScroll(y);
 }
 
-void render(const Geometry& object, const Geometry& light, const Shader& s_phong, const Shader& s_light) {
+void render(const Geometry& object, const Geometry& light, const Shader& s_gouraud, const Shader& s_light) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glm::mat4 view = camera.getViewMatrix();
@@ -84,24 +84,24 @@ void render(const Geometry& object, const Geometry& light, const Shader& s_phong
 
     light.render();
 
-    s_phong.use();
+    s_gouraud.use();
     model = glm::mat4(1.0f);
-    s_phong.set("model", model);
-    s_phong.set("view", view);
-    s_phong.set("proj", proj);
+    s_gouraud.set("model", model);
+    s_gouraud.set("view", view);
+    s_gouraud.set("proj", proj);
 
     glm::mat3 normalMat = glm::inverse(glm::transpose(glm::mat3(model)));
-    s_phong.set("normalMat", normalMat);
+    s_gouraud.set("normalMat", normalMat);
 
-    s_phong.set("objectColor", glm::vec3(0.6f, 0.5f, 0.2f));
-    s_phong.set("lightColor", lightColor);
+    s_gouraud.set("objectColor", glm::vec3(0.6f, 0.5f, 0.2f));
+    s_gouraud.set("lightColor", lightColor);
 
-    s_phong.set("ambientStrength", 0.2f);
-    s_phong.set("lightPos", lightPos);
+    s_gouraud.set("ambientStrength", 0.2f);
+    s_gouraud.set("lightPos", lightPos);
 
-    s_phong.set("viewPos", camera.getPosition());
-    s_phong.set("shininess", 64);
-    s_phong.set("specularStrength", 0.6f);
+    s_gouraud.set("viewPos", camera.getPosition());
+    s_gouraud.set("shininess", 64);
+    s_gouraud.set("specularStrength", 0.6f);
 
     object.render();
 }
@@ -111,7 +111,7 @@ int main(int, char* []) {
 
     glClearColor(0.0f, 0.3f, 0.6f, 1.0f);
 
-    const Shader s_phong("../projects/EJ07_04/phong.vs", "../projects/EJ07_04/blinn.fs");
+    const Shader s_gouraud("../projects/EJ07_04/gouraud.vs", "../projects/EJ07_04/gouraud.fs");
     const Shader s_light("../projects/EJ07_04/light.vs", "../projects/EJ07_04/light.fs");
     const Sphere sphere(1.0f, 50, 50);
 
@@ -133,7 +133,7 @@ int main(int, char* []) {
         lastFrame = currentFrame;
 
         handleInput(deltaTime);
-        render(sphere, sphere, s_phong, s_light);
+        render(sphere, sphere, s_gouraud, s_light);
         window->frame();
     }
 
