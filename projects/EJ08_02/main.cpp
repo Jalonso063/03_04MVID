@@ -97,8 +97,20 @@ void render(const Geometry& object, const Geometry& light, const Shader& s_phong
     s_phong.set("viewPos", camera.getPosition());
 
     s_phong.set("light.position", lightPos);
+    /*
+        cuanto mayor sea el valor de la luz ambiental, mas luz se emitira en toda la esfera. En este caso, al poder controlar los valores rgb, se podra
+        alternar el color de la luz ambiental y por lo tanto si aumentamos demasiado los valores la esfera se visualizara en su totalidad del color que
+        genere la combinacion de la terna.
+    */
     s_phong.set("light.ambient", 0.1f, 0.1f, 0.1f);
+    /*
+        el valor del diffuse marca el color e intensidad de la luz que es emitida al modelo. Es decir, si cambiamos los valores del vector al 0.0f, 0.0f, 0.1f,
+        la esfera tendra un color mas rojizo.
+    */
     s_phong.set("light.diffuse", lightDiffuse);
+    /*
+        cuanto mayor sea el valor de la luz especular, mas intenso es el punto donde se refleja la luz que "rebota" en la esfera.
+    */
     s_phong.set("light.specular", 1.0f, 1.0f, 1.0f);
 
     t_albedo.use(s_phong, "material.diffuse", 0);
