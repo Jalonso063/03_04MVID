@@ -1,3 +1,6 @@
 ﻿build
 lib
 third_party
+/.vs/VSWorkspaceState.json
+/.vs/códigoPracticas/v16
+/.vs/slnx.sqlite

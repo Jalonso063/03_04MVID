@@ -23,6 +23,7 @@ class Camera {
         glm::mat4 getViewMatrix() const;
         float getFOV() const;
         glm::vec3 getPosition() const;
+        glm::mat4 lookAt() const;
 
         void handleKeyboard(Movement direction, float dt);
         void handleMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);

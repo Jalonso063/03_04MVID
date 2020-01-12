@@ -17,6 +17,23 @@ glm::mat4 Camera::getViewMatrix() const {
     return glm::lookAt(_position, _position + _front, _up);
 }
 
+glm::mat4 Camera::lookAt() const {
+
+    glm::vec3 normalRight = glm::normalize(_right), normalUp = glm::normalize(_up), normalFront = glm::normalize(_front);
+
+    glm::mat4 vertexMatrix = { normalRight.x,  normalUp.x, -normalFront.x, 0,
+                               normalRight.y,  normalUp.y, -normalFront.y, 0,
+                               normalRight.z,  normalUp.z, -normalFront.z, 0,
+                                    0,              0,          0,        1 };
+
+    glm::mat4 positionMatrix = {        1,                  0,               0,           0,
+                                        0,                  1,               0,           0,
+                                        0,                  0,               1,           0,
+                                  -_position.x,       -_position.y,    -_position.z,      1 };
+
+    return vertexMatrix * positionMatrix;
+}
+
 float Camera::getFOV() const {
     return _fov;
 }
