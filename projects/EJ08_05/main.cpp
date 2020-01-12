@@ -116,7 +116,7 @@ int main(int, char* []) {
     const Shader s_phong("../projects/EJ08_05/phong.vs", "../projects/EJ08_05/blinn.fs");
     const Shader s_light("../projects/EJ08_05/light.vs", "../projects/EJ08_05/light.fs");
     const Texture t_albedo("../assets/textures/bricks_albedo.png", Texture::Format::RGB);
-    const Texture t_specular("../assets/textures/bricks_specular.png", Texture::Format::RGB);
+    const Texture t_specular("../assets/textures/bricks_albedo_specular_verde.png", Texture::Format::RGB);
     const Sphere sphere(1.0f, 50, 50);
 
     Texture tex("../assets/textures/blue_blocks.jpg", Texture::Format::RGB);
