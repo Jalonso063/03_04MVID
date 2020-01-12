@@ -11,10 +11,12 @@
 #include "engine/window.hpp"
 #include "engine/geometry/sphere.hpp"
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 20.0f));
 float lastFrame = 0.0f;
 float lastX, lastY;
 bool firstMouse = true;
+
+const int cubesInWorld = 3;
 
 void handleInput(float dt) {
     Input* input = Input::instance();
@@ -62,18 +64,35 @@ void onScrollMoved(float x, float y) {
     camera.handleMouseScroll(y);
 }
 
-void render(const Geometry* geometries, const Shader& shader, const Texture* textures, const glm::vec3* views) {
+void render(const Geometry& floor, Geometry* cubes, const Shader& shader, const Texture& floorTexture, const Texture* textures, const glm::vec3* models) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+    
     glm::mat4 proj = glm::perspective(glm::radians(camera.getFOV()), 800.0f / 600.0f, 0.1f, 100.0f);
-
     glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 view = camera.getViewMatrix();   
 
-    for (int geometryIndex = 0; geometryIndex < 4; geometryIndex++)
+    shader.use();
+
+    model = glm::translate(model, glm::vec3(0.0f, -5.0f, -25.0f));
+    model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::scale(model, glm::vec3(100.0f, 100.0f, 100.0f));
+
+    floorTexture.use(shader, "tex", 0);
+
+    shader.set("model", model);
+    shader.set("view", view);
+    shader.set("proj", proj);
+
+    floor.render();
+
+
+    for (int geometryIndex = 0; geometryIndex < cubesInWorld; geometryIndex++)
     {
-        glm::mat4 view = glm::translate(camera.getViewMatrix(), views[geometryIndex]);
 
-        const Geometry& geom = geometries[geometryIndex];
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, models[geometryIndex]);
+
+        const Geometry& geom = cubes[geometryIndex];
         const Texture& tex = textures[geometryIndex];
 
         shader.use();
@@ -81,8 +100,6 @@ void render(const Geometry* geometries, const Shader& shader, const Texture* tex
         tex.use(shader, "tex", 0);
 
         shader.set("model", model);
-        shader.set("view", view);
-        shader.set("proj", proj);
 
         geom.render();
     }
@@ -94,35 +111,33 @@ int main(int, char* []) {
     glClearColor(0.0f, 0.3f, 0.6f, 1.0f);
 
     const Shader shader("../projects/EJ06_02/vertex.vs", "../projects/EJ06_02/fragment.fs");
-    //const Cube cube(1.0f);
-    //const Sphere sphere(1.0f, 50, 50);
 
-    const Quad floor(50.0f, 50.0f);
-    const Cube cube1(10.0f);
-    const Cube cube2(20.0f);
-    const Cube cube3(5.0f);
+    const Quad floor(1.0f);
+    Texture floorTexture("../assets/textures/bricks_albedo.png", Texture::Format::RGB);
 
 
-    Geometry* geometries = new Geometry[4];
-    geometries[0] = floor;
-    geometries[1] = cube1;
-    geometries[2] = cube2;
-    geometries[3] = cube3;
+    const Cube cube1(5.0f);
+    const Cube cube2(7.0f);
+    const Cube cube3(10.0f);
 
-    const Texture* textures = new Texture[4]
+
+    Geometry* cubes = new Geometry[cubesInWorld];
+    cubes[0] = cube1;
+    cubes[1] = cube2;
+    cubes[2] = cube3;
+
+    const Texture* cubeTextures = new Texture[cubesInWorld]
     {
-        Texture("../assets/textures/bricks_albedo.png", Texture::Format::RGB),
         Texture("../assets/textures/bricks_arrow.jpg", Texture::Format::RGB),
         Texture("../assets/textures/blue_blocks.jpg", Texture::Format::RGB),
         Texture("../assets/textures/cube_uv_b.jpg", Texture::Format::RGB)
     };
 
-    const glm::vec3 views[4]
+    const glm::vec3 cubeModels[cubesInWorld]
     {
-        glm::vec3(0.0f, -10.0f, -50.0f),
-        glm::vec3(-20.0f, -5.0f, -40.0f),
-        glm::vec3(0.0f, 0.0f, -80.0f),
-        glm::vec3(30.0f, -7.5f, -70.0f)
+        glm::vec3(0.0f, -2.5f, -10.0f),
+        glm::vec3(15.0f, -1.5f, -25.0f),
+        glm::vec3(-20.0f, 0.0f, -35.0f)
     };
 
     glEnable(GL_CULL_FACE);
@@ -141,7 +156,7 @@ int main(int, char* []) {
         lastFrame = currentFrame;
 
         handleInput(deltaTime);
-        render(geometries, shader, textures, views);
+        render(floor, cubes, shader, floorTexture, cubeTextures, cubeModels);        
         window->frame();
     }
 
