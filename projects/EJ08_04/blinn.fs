@@ -9,6 +9,7 @@ in vec2 uv;
 struct Material {
     sampler2D diffuse;
     sampler2D specular;
+    sampler2D emissive;
     int shininess;
 };
 uniform Material material;
@@ -19,6 +20,7 @@ struct Light {
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+    vec3 emissive;
 };
 uniform Light light;
 
@@ -37,7 +39,8 @@ void main() {
     vec3 halfwayDir = normalize(lightDir + viewDir);
     float spec = pow(max(dot(norm, halfwayDir), 0.0), material.shininess);
     vec3 specular = spec * vec3(texture(material.specular, uv)) * light.specular;
+    vec3 emissive = vec3(texture(material.emissive, uv)) * light.emissive;
 
-    vec3 phong = ambient + diffuse + specular;
+    vec3 phong = ambient + diffuse + specular + emissive;
     FragColor = vec4(phong, 1.0f);
 }

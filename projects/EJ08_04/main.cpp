@@ -65,7 +65,7 @@ void onScrollMoved(float x, float y) {
 }
 
 void render(const Geometry& object, const Geometry& light, const Shader& s_phong, const Shader& s_light,
-    const Texture& t_albedo, const Texture& t_specular) {
+    const Texture& t_albedo, const Texture& t_specular, const Texture& t_emissive) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glm::mat4 view = camera.getViewMatrix();
@@ -100,9 +100,11 @@ void render(const Geometry& object, const Geometry& light, const Shader& s_phong
     s_phong.set("light.ambient", 0.1f, 0.1f, 0.1f);
     s_phong.set("light.diffuse", lightDiffuse);
     s_phong.set("light.specular", 1.0f, 1.0f, 1.0f);
+    s_phong.set("light.emissive", 0.0f, 1.0f, 0.0f); // emitira una luz verde
 
     t_albedo.use(s_phong, "material.diffuse", 0);
     t_specular.use(s_phong, "material.specular", 1);
+    t_emissive.use(s_phong, "material.emissive", 2);
     s_phong.set("material.shininess", 32);
 
     object.render();
@@ -117,9 +119,8 @@ int main(int, char* []) {
     const Shader s_light("../projects/EJ08_04/light.vs", "../projects/EJ08_04/light.fs");
     const Texture t_albedo("../assets/textures/bricks_albedo.png", Texture::Format::RGB);
     const Texture t_specular("../assets/textures/bricks_specular.png", Texture::Format::RGB);
+    const Texture t_emissive("../assets/textures/emissive.jpg", Texture::Format::RGB);
     const Sphere sphere(1.0f, 50, 50);
-
-    Texture tex("../assets/textures/blue_blocks.jpg", Texture::Format::RGB);
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -137,7 +138,7 @@ int main(int, char* []) {
         lastFrame = currentFrame;
 
         handleInput(deltaTime);
-        render(sphere, sphere, s_phong, s_light, t_albedo, t_specular);
+        render(sphere, sphere, s_phong, s_light, t_albedo, t_specular, t_emissive);
         window->frame();
     }
 
