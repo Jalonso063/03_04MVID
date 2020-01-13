@@ -18,24 +18,31 @@ include(cmake/compiler.cmake)
 set(ENGINE_SRC_FILES
     ${CMAKE_CURRENT_LIST_DIR}/src/engine/camera.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/engine/deps.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/engine/mesh.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/engine/model.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/engine/shader.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/engine/texture.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/engine/window.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/engine/geometry/cube.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/engine/geometry/geometry.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/engine/geometry/quad.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/src/engine/geometry/sphere.cpp)
+    ${CMAKE_CURRENT_LIST_DIR}/src/engine/geometry/sphere.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/engine/geometry/teapot.cpp)
 
 set(ENGINE_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/camera.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/input.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/engine/mesh.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/engine/model.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/shader.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/texture.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/window.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/geometry/cube.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/geometry/geometry.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/geometry/quad.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/include/engine/geometry/sphere.hpp)
+    ${CMAKE_CURRENT_LIST_DIR}/include/engine/geometry/sphere.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/engine/geometry/teapot.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/engine/geometry/teapotdata.hpp)
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src/engine/ PREFIX "Source Files" FILES ${ENGINE_SRC_FILES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/include/engine PREFIX "Header Files" FILES ${ENGINE_HEADER_FILES})
@@ -43,18 +50,26 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/include/engine PREFIX "Header File
 add_library(EngineLib STATIC ${ENGINE_SRC_FILES} ${ENGINE_HEADER_FILES} ${DEPS_SRC_FILES_COMMON})
 
 target_include_directories(EngineLib PRIVATE ${INCLUDE_PATHS})
+target_link_libraries(EngineLib PRIVATE
+    debug ${CMAKE_CURRENT_LIST_DIR}/libs/Debug/assimp-vc142-mt.lib
+    optimized ${CMAKE_CURRENT_LIST_DIR}/libs/Release/assimp-vc142-mt.lib)
 target_compile_definitions(EngineLib PRIVATE -D_GLFW_USE_OPENGL=1)
 target_compile_features(EngineLib PRIVATE cxx_std_14)
 
 configure_platform(EngineLib)
 configure_compiler(EngineLib)
 
+add_custom_command(TARGET EngineLib POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${CMAKE_CURRENT_LIST_DIR}/libs/$<CONFIGURATION>/assimp-vc142-mt.dll"
+    $<TARGET_FILE_DIR:EngineLib>)
+
 #****************************************************
 # Projects
 #****************************************************
 # List of projects
 set(PROJECT_LIST AG01 AG02 AG03 AG04 AG05 AG06 AG07 AG08_01 AG08_02
-    AG09_01 AG09_02 AG09_03 AG09_04 AG09_05 AG10 AG11_01 AG11_02 AG11_03 AG12 AG13 AG14
+    AG09_01 AG09_02 AG09_03 AG09_04 AG10 AG11_01 AG11_02 AG11_03 AG12 AG13 AG14
     EJ02_01 EJ02_02 EJ02_03 EJ02_04 EJ02_05 EJ02_06
     EJ03_01 EJ03_02 EJ03_03 EJ03_04
     EJ04_01 EJ04_02 EJ04_03 EJ04_04 EJ04_05

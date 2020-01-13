@@ -6,7 +6,7 @@
 
 Implementar 4 ejercicios complementarios a AG09, basándose en la implementación de dicha AG09 vista en clase realizar:
 
-- EJ09.01 - Pintar una tetera sobre un plano, una luz girando alrededor del eje Y, usando el modelo Blinn Phong.
+- EJ09.01 - Pintar una tetera sobre un plano, una point light girando alrededor del eje Y, usando el modelo Blinn Phong.
 - EJ09.02 - Implementar un nuevo tipo de luz, FlashLight o Linterna, que funcione como una SpotLight (conos suavizados), pero que se mueva con la cámara y siempre ilumine hacia adelante. Como si el personaje de un juego llevara una linterna siempre apuntando hacia adelante.
 - EJ09.03 - Implementar el sistema de multiples luces, ahora incorporando también varias SpotLights a la escena de prueba.
 - EJ09.04 - En la escena del punto 1, pintarla con una luz direccional, 2 point lights y 2 spotlights. Pintar una esfera para cada luz en la posición de cada una de ellas. Y hacer que cada luz emita un color/propiedades distintas.
