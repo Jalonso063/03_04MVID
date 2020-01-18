@@ -25,6 +25,8 @@ class Camera {
         glm::vec3 getPosition() const;
         glm::mat4 lookAt() const;
 
+        glm::vec3 getCameraView() const;
+
         void handleKeyboard(Movement direction, float dt);
         void handleMouseMovement(float xoffset, float yoffset, bool constrainPitch = true);
         void handleMouseScroll(float yoffset);
