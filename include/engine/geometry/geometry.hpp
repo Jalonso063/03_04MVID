@@ -24,9 +24,12 @@ class Geometry {
     protected:
         void uploadData(const float* positions, const float* uvs,
             const float* normals, const uint32_t* indices);
+
+        void calcTangents(const float* positions, const float* uvs,
+            const float* normals, float* tangents, float* biTangents) const;
     protected:
         uint32_t _VAO = 0;
-        uint32_t _VBO[4] { 0,0,0,0 };
+        uint32_t _VBO[6] { 0,0,0,0,0,0 };
         uint32_t _nVertices = 0;
         uint32_t _nElements = 0;
 
