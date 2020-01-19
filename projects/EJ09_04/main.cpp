@@ -12,24 +12,44 @@
 #include "engine/geometry/quad.hpp"
 #include "engine/geometry/teapot.hpp"
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 1.0f, 10.0f));
 
 glm::vec3 dirLightDirection(-0.2f, -1.0f, -0.3f);
+glm::vec3 lightPos(4.0f, 1.0f, 0.0f);
 
 glm::vec3 pointLightPositions[] = {
     glm::vec3(4.0f, 2.0f, 0.0f),
-    glm::vec3(-4.0f, 2.0f, 0.0f)
+    glm::vec3(-4.0f, 2.0f, 0.0f),    
+    glm::vec3(4.0f, 1.0f, 0.0f)
 };
 
-glm::vec3 cubePositions[] = {
-    glm::vec3(4.0f, 0.0f, 0.0f),
-    glm::vec3(-4.0f, 0.0f, 0.0f),
-    glm::vec3(0.0f, 0.0f, 4.0f),
-    glm::vec3(0.0f, 0.0f, -4.0f),
-    glm::vec3(4.0f, 0.0f, 4.0f),
-    glm::vec3(4.0f, 0.0f, -4.0f),
-    glm::vec3(-4.0f, 0.0f, 4.0f),
-    glm::vec3(-4.0f, 0.0f, -4.0f),
+glm::vec3 spotLightPositions[] = {
+    glm::vec3(4.0f, 2.0f, -4.0f),
+    glm::vec3(-4.0f, 2.0f, -4.0f),
+    glm::vec3(-4.0f, 2.0f, 4.0f)
+};
+
+glm::vec3 spotLightValues[] =
+{
+    glm::vec3(0.5f, 0.0f, 0.0f),
+    glm::vec3(0.0f, 0.0f, 0.5f),
+    glm::vec3(0.0f, 0.5f, 0.0f)
+};
+
+
+
+glm::vec3 diffuseValues[] =
+{
+    glm::vec3(0.2f, 0.0f, 0.0f),
+    glm::vec3(0.2f, 0.0f, 0.2f),
+    glm::vec3(0.2f, 0.2f, 0.2f)
+};
+
+glm::vec3 specularValues[] =
+{
+    glm::vec3(0.5f, 0.0f, 0.0f),
+    glm::vec3(0.5f, 0.0f, 0.5f),
+    glm::vec3(0.5f, 0.5f, 0.5f)
 };
 
 float lastFrame = 0.0f;
@@ -89,19 +109,45 @@ void render(const Geometry& floor, const Geometry& object, const Geometry& light
     glm::mat4 view = camera.getViewMatrix();
     glm::mat4 proj = glm::perspective(glm::radians(camera.getFOV()), 800.0f / 600.0f, 0.1f, 100.0f);
 
+    lightPos = glm::vec3(std::sin((float)glfwGetTime()) * 4.0f, 1.0f, std::cos((float)glfwGetTime()) * 4.0f);
+
     s_light.use();
 
-    for (const auto& pointPos : pointLightPositions) {
+
+    for (uint32_t i = 0; i < pointLightPositions->length(); ++i)
+    {
+        const auto& pointPos = pointLightPositions[i];
+            
+        glm::mat4 model = glm::mat4(1.0f);
+        if (i != pointLightPositions->length() -1)
+            model = glm::translate(model, pointPos);
+        else
+            model = glm::translate(model, lightPos);
+
+        model = glm::scale(model, glm::vec3(0.25f));
+        s_light.set("model", model);
+        s_light.set("view", view);
+        s_light.set("proj", proj);
+        s_light.set("lightColor", specularValues[i]);
+
+        light.render();
+    }
+
+    for (uint32_t i = 0; i < spotLightPositions->length() ; ++i)
+    {
+        const auto& pointPos = spotLightPositions[i];
+
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, pointPos);
         model = glm::scale(model, glm::vec3(0.25f));
         s_light.set("model", model);
         s_light.set("view", view);
         s_light.set("proj", proj);
-        s_light.set("lightColor", 1.0f, 0.0f, 0.0f);
+        s_light.set("lightColor", spotLightValues[i]);
 
         light.render();
     }
+
 
     s_phong.use();
     glm::mat4 model = glm::mat4(1.0f);
@@ -123,15 +169,36 @@ void render(const Geometry& floor, const Geometry& object, const Geometry& light
     s_phong.set("dirLight.specular", 0.2f, 0.2f, 0.2f);
 
     const std::string prefixPoints = "pointLight[";
-    for (uint32_t i = 0; i < sizeof(pointLightPositions); ++i) {
+    for (uint32_t i = 0; i < pointLightPositions->length() ; ++i) {
         const std::string lightName = prefixPoints + std::to_string(i) + "].";
-        s_phong.set((lightName + "position").c_str(), pointLightPositions[i]);
+
+        if (i != pointLightPositions->length() -1 )
+            s_phong.set((lightName + "position").c_str(), pointLightPositions[i]);
+        else
+            s_phong.set((lightName + "position").c_str(), lightPos);
+
         s_phong.set((lightName + "ambient").c_str(), 0.02f, 0.02f, 0.02f);
-        s_phong.set((lightName + "diffuse").c_str(), 0.2f, 0.0f, 0.0f);
-        s_phong.set((lightName + "specular").c_str(), 0.5f, 0.0f, 0.0f);
+        s_phong.set((lightName + "diffuse").c_str(), diffuseValues[i]);
+        s_phong.set((lightName + "specular").c_str(), specularValues[i]);
         s_phong.set((lightName + "constant").c_str(), 1.0f);
         s_phong.set((lightName + "linear").c_str(), 0.09f);
         s_phong.set((lightName + "quadratic").c_str(), 0.032f);
+    }
+
+    const std::string prefixSpotPoints = "spotLight[";
+    for (uint32_t i = 0; i < spotLightPositions->length() ; ++i) {
+        const std::string lightName = prefixSpotPoints + std::to_string(i) + "].";
+
+        s_phong.set((lightName + "position").c_str(), spotLightPositions[i]);
+        s_phong.set((lightName + "direction").c_str(), 0.0f, -1.0f, 0.0f);
+        s_phong.set((lightName + "ambient").c_str(), 0.02f, 0.02f, 0.02f);
+        s_phong.set((lightName + "diffuse").c_str(), spotLightValues[i]);
+        s_phong.set((lightName + "specular").c_str(), spotLightPositions[i]);
+        s_phong.set((lightName + "constant").c_str(), 1.0f);
+        s_phong.set((lightName + "linear").c_str(), 0.09f);
+        s_phong.set((lightName + "quadratic").c_str(), 0.032f);
+        s_phong.set((lightName + "cutOff").c_str(), glm::cos(glm::radians(10.0f)));
+        s_phong.set((lightName + "outerCutOff").c_str(), glm::cos(glm::radians(15.0f)));
     }
 
     t_albedo.use(s_phong, "material.diffuse", 0);
@@ -140,19 +207,17 @@ void render(const Geometry& floor, const Geometry& object, const Geometry& light
 
     floor.render();
 
-    for (const auto& cubePos : cubePositions) {
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, cubePos);
-        model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.0f));
-        model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
-        s_phong.set("model", model);
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.0f));
+    model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
 
-        glm::mat3 normalMat = glm::inverse(glm::transpose(glm::mat3(model)));
-        s_phong.set("normalMat", normalMat);
+    s_phong.set("model", model);
 
-        object.render();
-    }
+    normalMat = glm::inverse(glm::transpose(glm::mat3(model)));
+    s_phong.set("normalMat", normalMat);
+
+    object.render();
 }
 
 int main(int, char* []) {
