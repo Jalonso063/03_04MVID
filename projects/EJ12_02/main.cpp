@@ -10,6 +10,7 @@
 #include "engine/window.hpp"
 #include "engine/geometry/sphere.hpp"
 #include "engine/geometry/quad.hpp"
+#include <engine\model.hpp>
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
@@ -64,7 +65,7 @@ void onScrollMoved(float x, float y) {
     camera.handleMouseScroll(y);
 }
 
-void render(const Geometry& object, const Shader& s_phong, const Shader& s_normal,
+void render(const Model& object,  const Shader& s_normal,
     const Texture& t_albedo, const Texture& t_specular, const Texture& t_normal) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -72,36 +73,11 @@ void render(const Geometry& object, const Shader& s_phong, const Shader& s_norma
     glm::mat4 proj = glm::perspective(glm::radians(camera.getFOV()), 800.0f / 600.0f, 0.1f, 100.0f);
 
     lightPos = glm::vec3(std::sin((float)glfwGetTime() / 2.0f), 0.0f, std::abs(std::cos((float)glfwGetTime() / 2.0f)));
-
-    {
-        s_phong.use();
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(1.0f, 0.0f, 0.0f));
-        s_phong.set("model", model);
-        s_phong.set("view", view);
-        s_phong.set("proj", proj);
-
-        glm::mat3 normalMat = glm::inverse(glm::transpose(glm::mat3(model)));
-        s_phong.set("normalMat", normalMat);
-
-        s_phong.set("viewPos", camera.getPosition());
-
-        s_phong.set("light.position", lightPos);
-        s_phong.set("light.ambient", 0.1f, 0.1f, 0.1f);
-        s_phong.set("light.diffuse", 0.5f, 0.5f, 0.5f);
-        s_phong.set("light.specular", 1.0f, 1.0f, 1.0f);
-
-        t_albedo.use(s_phong, "material.diffuse", 0);
-        t_specular.use(s_phong, "material.specular", 1);
-        s_phong.set("material.shininess", 32);
-
-        object.render();
-    }
-
+   
     {
         s_normal.use();
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-1.0f, 0.0f, 0.0f));
+        model = glm::translate(model, glm::vec3(-1.0f, -3.0f, -10.0f));
         s_normal.set("model", model);
         s_normal.set("view", view);
         s_normal.set("proj", proj);
@@ -121,7 +97,7 @@ void render(const Geometry& object, const Shader& s_phong, const Shader& s_norma
         t_normal.use(s_normal, "material.normal", 2);
         s_normal.set("material.shininess", 32);
 
-        object.render();
+        object.render(s_normal);
     }
 }
 
@@ -130,12 +106,11 @@ int main(int, char* []) {
 
     glClearColor(0.0f, 0.3f, 0.6f, 1.0f);
 
-    const Shader s_phong("../projects/EJ12_02/phong.vs", "../projects/EJ12_02/blinn.fs");
-    const Shader s_normal("../projects/EJ12_02/normal.vs", "../projects/EJ12_02/normal.fs");
-    const Texture t_albedo("../assets/textures/bricks_albedo.png", Texture::Format::RGB);
-    const Texture t_specular("../assets/textures/bricks_specular.png", Texture::Format::RGB);
-    const Texture t_normal("../assets/textures/bricks_normal.png", Texture::Format::RGB);
-    const Quad quad(2.0f);
+    const Shader s_normal("../projects/EJ12_02/normal.vs", "../projects/EJ12_02/blinn.fs");
+    const Texture t_albedo("../assets/models/Freighter/Freighter_C.jpg", Texture::Format::RGB);
+    const Texture t_specular("../assets/models/Freighter/Freighter_S.jpg", Texture::Format::RGB);
+    const Texture t_normal("../assets/models/Freighter/Freighter_N.jpg", Texture::Format::RGB);
+    const Model object("../assets/models/Freighter/Freigther_BI_Export.obj");
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -156,7 +131,7 @@ int main(int, char* []) {
         lastFrame = currentFrame;
 
         handleInput(deltaTime);
-        render(quad, s_phong, s_normal, t_albedo, t_specular, t_normal);
+        render(object, s_normal, t_albedo, t_specular, t_normal);
         window->frame();
     }
 
