@@ -68,7 +68,10 @@ void Geometry::uploadData(const float* positions, const float* uvs, const float*
     const auto tangents = new float[length];
     const auto biTangents = new float[length];
 
-    calcTangents(positions, uvs, normals, tangents, biTangents);
+    memset(tangents, 0.0f, length * sizeof(float));
+    memset(biTangents, 0.0f, length * sizeof(float));
+
+    //calcTangents(positions, uvs, normals, tangents, biTangents);
 
     glGenVertexArrays(1, &_VAO);
     glGenBuffers(6, _VBO);

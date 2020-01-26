@@ -6,7 +6,7 @@
 
 Implementar 2 ejercicios complementarios a AG14, basándose en la implementación de dicha AG14 vista en clase realizar:
 
-- EJ14.01 - Usando la misma escena de AG14, implementar las sombras que genera una fuente de luz de tipo SpotLight (http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/  -> sección spotlights). Se adjunta codigo para el fragment shader para usar en el Shader de fragmentos de debug para visualizar el depth map.
+- EJ14.01 - Usando la misma escena de AG14, implementar las sombras que genera una fuente de luz de tipo SpotLight (http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/  -> sección spotlights). Se adjunta el codigo del fragment shader para visualizar el depth map para debug.
 - EJ14.02 - Usando la misma escena, implementar un sistema con dos luces, donde ambas generan sombras (Pintar las fuentes de luces con sendas esferas blancas para localizarlas en la escena 3D).
 
 Cada uno de los proyectos en ejecución mostrará una ventana pintando lo solicitado en cada uno.
