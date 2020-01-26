@@ -111,9 +111,9 @@ void render(const Geometry& quad, const Geometry& cube, const Shader& s_phong, c
     s_phong.set("viewPos", camera.getPosition());
 
     s_phong.set("light.position", lightPos);
-    s_phong.set("light.ambient", 0.1f, 0.0f, 0.0f);
-    s_phong.set("light.diffuse", 0.5f, 0.0f, 0.0f);
-    s_phong.set("light.specular", 1.0f, 0.0f, 0.0f);
+    s_phong.set("light.ambient", 0.1f, 0.1f, 0.1f);
+    s_phong.set("light.diffuse", 0.5f, 0.5f, 0.5f);
+    s_phong.set("light.specular", 1.0f, 1.0f, 1.0f);
 
     t_albedo.use(s_phong, "material.diffuse", 0);
     t_specular.use(s_phong, "material.specular", 1);

@@ -6,31 +6,33 @@ in vec2 uv;
 
 uniform sampler2D screenTexture;
 
-const float offset = 1.0 / 600.0;
+mat3 sx = mat3( 
+    1.0, 2.0, 1.0, 
+    0.0, 0.0, 0.0, 
+   -1.0, -2.0, -1.0 
+);
+
+mat3 sy = mat3( 
+    1.0, 0.0, -1.0, 
+    2.0, 0.0, -2.0, 
+    1.0, 0.0, -1.0 
+);
 
 void main() {
-    vec2 offsets[9] = vec2[](
-        vec2(-offset, offset),
-        vec2(0.0, offset),
-        vec2(offset, offset),
-        vec2(-offset, 0.0),
-        vec2(0.0, 0.0),
-        vec2(offset, 0.0),
-        vec2(-offset, -offset),
-        vec2(0.0, -offset),
-        vec2(offset, -offset)
-    );
 
-    float kernel[9] = float[] (
-        1, 1, 1,
-        1,  -8, 1,
-        1, 1, 1
-    );
-
-    vec3 color = vec3(0.0);
-    for (int i = 0; i < 9; ++i) {
-        color += vec3(texture(screenTexture, uv.st + offsets[i])) * kernel[i];
+    vec3 diffuse = texture(screenTexture, uv.st).rgb;
+    mat3 A;
+    for (int i=0; i<3; i++) {
+        for (int j=0; j<3; j++) {
+            vec3 texel  = texelFetch(screenTexture, ivec2(gl_FragCoord) + ivec2(i-1,j-1), 0 ).rgb;
+            A[i][j] = length(texel); 
+        }
     }
 
-    FragColor = vec4(color, 1.0);
+    float gx = dot(sx[0], A[0]) + dot(sx[1], A[1]) + dot(sx[2], A[2]); 
+    float gy = dot(sy[0], A[0]) + dot(sy[1], A[1]) + dot(sy[2], A[2]);
+
+    float g = sqrt(pow(gx, 2.0)+pow(gy, 2.0));
+    FragColor = vec4(diffuse - vec3(g), 1.0);
+   
 }
