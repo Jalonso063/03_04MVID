@@ -6,31 +6,20 @@ in vec2 uv;
 
 uniform sampler2D screenTexture;
 
-const float offset = 1.0 / 600.0;
+uniform vec2 offset;
 
 void main() {
-    vec2 offsets[9] = vec2[](
-        vec2(-offset, offset),
-        vec2(0.0, offset),
-        vec2(offset, offset),
-        vec2(-offset, 0.0),
-        vec2(0.0, 0.0),
-        vec2(offset, 0.0),
-        vec2(-offset, -offset),
-        vec2(0.0, -offset),
-        vec2(offset, -offset)
-    );
 
-    float kernel[9] = float[] (
-        1, 1, 1,
-        1,  -8, 1,
-        1, 1, 1
-    );
+float kernel[9] = float[] (
+    0.028532, 0.067234,	0.124009,
+    0.179044, 0.20236, 0.179044,
+    0.124009, 0.067234, 0.028532);
 
-    vec3 color = vec3(0.0);
-    for (int i = 0; i < 9; ++i) {
-        color += vec3(texture(screenTexture, uv.st + offsets[i])) * kernel[i];
+    vec3 tex = vec3(0.0);
+    for (int i = -4; i <= 4; ++i) {
+        tex += vec3(texture(screenTexture, uv + i*offset)) * kernel[i+4];
     }
 
-    FragColor = vec4(color, 1.0);
+    FragColor = vec4(tex, 1.0);
+
 }

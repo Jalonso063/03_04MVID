@@ -94,13 +94,14 @@ std::tuple<uint32_t, uint32_t, uint32_t> createFBO() {
 }
 
 void render(const Geometry& quad, const Geometry& cube, const Shader& s_phong, const Shader& s_fbo,
-    const Texture& t_albedo, const Texture& t_specular, const uint32_t fbo, const uint32_t fbo_texture) {
+    const Texture& t_albedo, const Texture& t_specular, const uint32_t fboVert, const uint32_t fboVert_texture,
+    const uint32_t fboHor, const uint32_t fboHor_texture) {
     glm::mat4 view = camera.getViewMatrix();
     glm::mat4 proj = glm::perspective(glm::radians(camera.getFOV()), static_cast<float>(Window::instance()->getWidth()) / Window::instance()->getHeight(), 0.1f, 100.0f);
 
     //FIRST PASS
     glEnable(GL_DEPTH_TEST);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fboVert);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -111,9 +112,9 @@ void render(const Geometry& quad, const Geometry& cube, const Shader& s_phong, c
     s_phong.set("viewPos", camera.getPosition());
 
     s_phong.set("light.position", lightPos);
-    s_phong.set("light.ambient", 0.1f, 0.0f, 0.0f);
-    s_phong.set("light.diffuse", 0.5f, 0.0f, 0.0f);
-    s_phong.set("light.specular", 1.0f, 0.0f, 0.0f);
+    s_phong.set("light.ambient", 0.1f, 0.1f, 0.1f);
+    s_phong.set("light.diffuse", 0.5f, 0.5f, 0.5f);
+    s_phong.set("light.specular", 1.0f, 1.0f, 1.0f);
 
     t_albedo.use(s_phong, "material.diffuse", 0);
     t_specular.use(s_phong, "material.specular", 1);
@@ -137,19 +138,26 @@ void render(const Geometry& quad, const Geometry& cube, const Shader& s_phong, c
 
     //SECOND PASS
 
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, fboHor);
     glDisable(GL_DEPTH_TEST);
 
-    glClear(GL_COLOR_BUFFER_BIT);
+    // primera pasada de blur gausiano, pasada vertical
 
     s_fbo.use();
-
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, fbo_texture);
+    glBindTexture(GL_TEXTURE_2D, fboVert_texture);
+    s_fbo.set("offset", 1.0f / (Window::instance()->getWidth()), 0.0f);
     s_fbo.set("screenTexture", 0);
+    quad.render();
 
+    // segunda pasada de blur gausiano, pasada horizontal
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glBindTexture(GL_TEXTURE_2D, fboHor_texture);
+    s_fbo.set("offset", 0.0f, 1.0f / (Window::instance()->getHeight()));
     quad.render();
 }
 
@@ -165,7 +173,8 @@ int main(int, char* []) {
     const Quad quad(2.0f);
     const Cube cube(1.0f);
 
-    auto fbo = createFBO();
+    auto fboVert = createFBO();
+    auto fboHor = createFBO();
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -180,13 +189,19 @@ int main(int, char* []) {
         lastFrame = currentFrame;
 
         handleInput(deltaTime);
-        render(quad, cube, s_phong, s_fbo, t_albedo, t_specular, std::get<0>(fbo), std::get<1>(fbo));
+        render(quad, cube, s_phong, s_fbo, t_albedo, t_specular,
+            std::get<0>(fboVert), std::get<1>(fboVert),
+            std::get<0>(fboHor), std::get<1>(fboHor));
         window->frame();
     }
 
-    glDeleteFramebuffers(1, &std::get<0>(fbo));
-    glDeleteTextures(1, &std::get<1>(fbo));
-    glDeleteRenderbuffers(1, &std::get<2>(fbo));
+    glDeleteFramebuffers(1, &std::get<0>(fboVert));
+    glDeleteTextures(1, &std::get<1>(fboVert));
+    glDeleteRenderbuffers(1, &std::get<2>(fboVert));
+
+    glDeleteFramebuffers(1, &std::get<0>(fboHor));
+    glDeleteTextures(1, &std::get<1>(fboHor));
+    glDeleteRenderbuffers(1, &std::get<2>(fboHor));
 
     return 0;
 }
