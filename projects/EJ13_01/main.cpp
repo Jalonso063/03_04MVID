@@ -13,6 +13,8 @@
 #include <iostream>
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+
+Camera secCamera(glm::vec3(0.0f, 0.0f, 3.0f));
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 float lastFrame = 0.0f;
@@ -98,6 +100,9 @@ void render(const Geometry& quad, const Geometry& cube, const Shader& s_phong, c
     glm::mat4 view = camera.getViewMatrix();
     glm::mat4 proj = glm::perspective(glm::radians(camera.getFOV()), static_cast<float>(Window::instance()->getWidth()) / Window::instance()->getHeight(), 0.1f, 100.0f);
 
+    glm::mat4 secView = secCamera.getViewMatrix();
+    glm::mat4 secProj = glm::perspective(glm::radians(45.0f), static_cast<float>(Window::instance()->getWidth()) / Window::instance()->getHeight(), 0.1f, 100.0f);
+
     //FIRST PASS
     glEnable(GL_DEPTH_TEST);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -105,15 +110,15 @@ void render(const Geometry& quad, const Geometry& cube, const Shader& s_phong, c
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     s_phong.use();
-    s_phong.set("view", view);
-    s_phong.set("proj", proj);
+    s_phong.set("view", secView);
+    s_phong.set("proj", secProj);
 
-    s_phong.set("viewPos", camera.getPosition());
+    s_phong.set("viewPos", 0.0f, 0.0f, 3.0f);
 
     s_phong.set("light.position", lightPos);
-    s_phong.set("light.ambient", 0.1f, 0.0f, 0.0f);
-    s_phong.set("light.diffuse", 0.5f, 0.0f, 0.0f);
-    s_phong.set("light.specular", 1.0f, 0.0f, 0.0f);
+    s_phong.set("light.ambient", 0.1f, 0.1f, 0.1f);
+    s_phong.set("light.diffuse", 0.5f, 0.5f, 0.5f);
+    s_phong.set("light.specular", 1.0f, 1.0f, 1.0f);
 
     t_albedo.use(s_phong, "material.diffuse", 0);
     t_specular.use(s_phong, "material.specular", 1);
@@ -143,6 +148,30 @@ void render(const Geometry& quad, const Geometry& cube, const Shader& s_phong, c
     glDisable(GL_DEPTH_TEST);
 
     glClear(GL_COLOR_BUFFER_BIT);
+
+
+    s_phong.set("view", view);
+    s_phong.set("proj", proj);
+
+    s_phong.set("viewPos", camera.getPosition());
+
+
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.0f));
+    model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    s_phong.set("model", model);
+    normalMat = glm::inverse(glm::transpose(glm::mat3(model)));
+    s_phong.set("normalMat", normalMat);
+
+    quad.render();
+
+    model = glm::mat4(1.0f);
+    s_phong.set("model", model);
+    normalMat = glm::inverse(glm::transpose(glm::mat3(model)));
+    s_phong.set("normalMat", normalMat);
+
+    cube.render();
+
 
     s_fbo.use();
 
