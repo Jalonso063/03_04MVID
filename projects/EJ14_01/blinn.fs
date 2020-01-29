@@ -16,10 +16,18 @@ uniform Material material;
 
 struct Light {
     vec3 position;
+    vec3 direction;
 
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
+
+    float constant;
+    float linear;
+    float quadratic;
+
+    float cutOff;
+    float outerCutOff;
 };
 uniform Light light;
 
@@ -38,7 +46,7 @@ float ShadowCalculation(vec4 fragPosLighSpace, float bias) {
     for(int x = -1; x <= 1; ++x) {
         for (int y = -1; y <=1; ++y) {
             float pcf = texture(depthMap, projCoords.xy + vec2(x,y) * texelSize).r;
-            shadow += currentDepth -bias > pcf ? 1.0 : 0.0;
+            shadow += currentDepth - (bias / fragPosLighSpace.w) > pcf ? 1.0 : 0.0;
         }
 	}
     shadow /= 9.0;
@@ -51,6 +59,11 @@ float ShadowCalculation(vec4 fragPosLighSpace, float bias) {
 }
 
 void main() {
+    float distance = length(light.position - fragPos);
+    float attenuation = 1.0 / (light.constant +
+        light.linear * distance +
+        light.quadratic * distance * distance);
+
     vec3 albedo = vec3(texture(material.diffuse, uv));
     vec3 ambient = albedo * light.ambient;
 
@@ -64,9 +77,13 @@ void main() {
     float spec = pow(max(dot(norm, halfwayDir), 0.0), material.shininess);
     vec3 specular = spec * vec3(texture(material.specular, uv)) * light.specular;
 
+    float theta = dot(lightDir, normalize(-light.direction));
+    float epsilon = light.cutOff - light.outerCutOff;
+    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
+
     float bias = max(0.05 * (1.0 - dot(norm, lightDir)), 0.005);
     float shadow = ShadowCalculation(fragPosLighSpace, bias);
 
-    vec3 phong = ambient + ((1.0 - shadow) * (diffuse + specular));
+    vec3 phong = (ambient + ((1.0 - shadow) * ((diffuse * intensity) + (specular * intensity)))) * attenuation;
     FragColor = vec4(phong, 1.0f);
 }

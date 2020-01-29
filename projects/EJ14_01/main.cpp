@@ -13,7 +13,8 @@
 #include <iostream>
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-glm::vec3 lightPos(1.2f, 3.0f, 2.0f);
+glm::vec3 lightPos(1.2f, 4.0f, 3.0f);
+glm::vec3 lightDir(-1.2f, -3.0f, -3.0f);
 
 const uint32_t k_shadow_height = 1024;
 const uint32_t k_shadow_width = 1024;
@@ -137,8 +138,8 @@ void render(const Geometry& quad, const Geometry& cube, const Geometry& sphere,
     glClear(GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
-    const glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, k_shadow_near, k_shadow_far);
-    const glm::mat4 lightView = glm::lookAt(lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    const glm::mat4 lightProjection = glm::perspective(glm::radians(45.0f), static_cast<float>(Window::instance()->getWidth()) / Window::instance()->getHeight(), k_shadow_near, k_shadow_far);
+    const glm::mat4 lightView = glm::lookAt(lightPos, lightDir, glm::vec3(0.0f, 1.0f, 0.0f));
     const glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
     s_depth.use();
@@ -152,21 +153,40 @@ void render(const Geometry& quad, const Geometry& cube, const Geometry& sphere,
     glViewport(0, 0, Window::instance()->getWidth(), Window::instance()->getHeight());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+
     glm::mat4 view = camera.getViewMatrix();
     glm::mat4 proj = glm::perspective(glm::radians(camera.getFOV()), static_cast<float>(Window::instance()->getWidth()) / Window::instance()->getHeight(), 0.1f, 100.0f);
+
+    // punto de luz
+    s_light.use();
+    glm::mat4 model = glm::mat4(1.0);
+    model = glm::translate(model, lightPos);
+    model = glm::scale(model, glm::vec3(0.2f, 0.2f, 0.2f));
+    s_light.set("model", model);
+    s_light.set("view", view);
+    s_light.set("proj", proj);
+    s_light.set("lightColor", 1.0f, 1.0f, 1.0f);
+
+    sphere.render();
 
     s_phong.use();
 
     s_phong.set("view", view);
     s_phong.set("proj", proj);
 
-    s_phong.set("viewPos", camera.getPosition());
-
     s_phong.set("light.position", lightPos);
+    s_phong.set("light.direction", lightDir);
     s_phong.set("light.ambient", 0.1f, 0.1f, 0.1f);
     s_phong.set("light.diffuse", 0.5f, 0.5f, 0.5f);
     s_phong.set("light.specular", 1.0f, 1.0f, 1.0f);
+    s_phong.set("light.constant", 1.0f);
+    s_phong.set("light.linear", 0.02f);
+    s_phong.set("light.quadratic", 0.06f);
+    s_phong.set("light.cutOff", glm::cos(glm::radians(20.0f)));
+    s_phong.set("light.outerCutOff", glm::cos(glm::radians(25.0f)));
 
+    t_albedo.use(s_phong, "material.diffuse", 0);
+    t_specular.use(s_phong, "material.specular", 1);
     s_phong.set("material.shininess", 32);
 
     s_phong.set("lightSpaceMatrix", lightSpaceMatrix);
@@ -177,17 +197,17 @@ void render(const Geometry& quad, const Geometry& cube, const Geometry& sphere,
 
     renderScene(s_phong, quad, cube, sphere, t_albedo, t_specular);
 
-    //glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    //glViewport(0, 0, Window::instance()->getWidth(), Window::instance()->getHeight());
-    //glClear(GL_COLOR_BUFFER_BIT);
-    //glDisable(GL_DEPTH_TEST);
+    /*glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, Window::instance()->getWidth(), Window::instance()->getHeight());
+    glClear(GL_COLOR_BUFFER_BIT);
+    glDisable(GL_DEPTH_TEST);
 
-    //s_debug.use();
-    //glActiveTexture(GL_TEXTURE0);
-    //glBindTexture(GL_TEXTURE_2D, fbo_texture);
-    //s_debug.set("depthMap", 0);
+    s_debug.use();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, fbo_texture);
+    s_debug.set("depthMap", 0);
 
-    //quad.render();
+    quad.render();*/
 }
 
 int main(int, char* []) {
