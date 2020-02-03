@@ -37,7 +37,7 @@ uniform sampler2D depthMap;
 
 #define NUMBER_SPOT_LIGHTS 2
 uniform SpotLight spotLight[NUMBER_SPOT_LIGHTS];
-in vec4 fragPosLighSpace[NUMBER_SPOT_LIGHTS];
+in vec4 fragPosLighSpace;
 
 float ShadowCalculation(vec4 fragPosLighSpace, float bias) {
     vec3 projCoords = fragPosLighSpace.xyz / fragPosLighSpace.w;
@@ -103,10 +103,10 @@ void main() {
     float spec = pow(max(dot(norm, halfwayDir), 0.0), material.shininess);
     vec3 specular = spec * vec3(texture(material.specular, uv)) * light.specular;
 
-    vec3 finalColor = vec3(0.0, 0.0, 0.0);
+    vec3 finalColor = vec3 (0.0, 0.0, 0.0);
 
     for (int i = 0; i < NUMBER_SPOT_LIGHTS; ++i) {
-        finalColor += calcSpotLight(spotLight[i],fragPosLighSpace[i], norm, viewDir, fragPos, albedo, specular);
+        finalColor += calcSpotLight(spotLight[i],fragPosLighSpace, norm, viewDir, fragPos, albedo, specular);
 	}
 
     FragColor = vec4(finalColor, 1.0f);
