@@ -11,8 +11,22 @@
 #include "engine/geometry/sphere.hpp"
 #include "engine/geometry/quad.hpp"
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 2.0f, 10.0f));
 glm::vec3 lightPos(4.0f, 1.0f, 0.0f);
+
+glm::vec3 normalQuad(0.0f, 0.0f, -4.0f);
+
+glm::vec3 colorQuadPositions[] = {
+    glm::vec3(0.0f, 0.0f, 2.0f),
+    glm::vec3(0.0f, 0.0f, 0.0f),
+    glm::vec3(0.0f, 0.0f, -2.0f)
+};
+
+glm::vec4 quadColors[] = {
+    glm::vec4(0.0f, 0.0f, 1.0f, 0.6f),
+    glm::vec4(0.0f, 1.0f, 0.0f, 0.4f),
+    glm::vec4(1.0f, 0.0f, 0.0f, 0.2f)
+};
 
 float lastFrame = 0.0f;
 float lastX, lastY;
@@ -64,9 +78,32 @@ void onScrollMoved(float x, float y) {
     camera.handleMouseScroll(y);
 }
 
-void render(const Geometry& floor, const Geometry& object, const Shader& s_phong, const Shader& s_blend, 
-    const Texture& t_albedo, const Texture& t_specular, const Texture& t_tree) {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+void renderNormalQuad(const Geometry& quad, const Shader& s_phong, const glm::vec3& quadPos)
+{
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, quadPos);
+    s_phong.set("model", model);
+
+    glm::mat3 normalMat = glm::inverse(glm::transpose(glm::mat3(model)));
+    s_phong.set("normalMat", normalMat);
+
+    quad.render();
+}
+
+void renderColorQuad(const Geometry& quad, const Shader& s_stencil, const glm::vec4& quadColor, const glm::vec3& quadPos)
+{
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, quadPos);
+
+    s_stencil.set("model", model);
+    s_stencil.set("color", quadColor);
+
+    quad.render();
+}
+
+void render(const Geometry& quad, const Geometry& object, const Shader& s_phong, const Shader& s_stencil,
+    const Texture& t_albedo, const Texture& t_specular) {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     glm::mat4 view = camera.getViewMatrix();
     glm::mat4 proj = glm::perspective(glm::radians(camera.getFOV()), 800.0f / 600.0f, 0.1f, 100.0f);
@@ -94,26 +131,24 @@ void render(const Geometry& floor, const Geometry& object, const Shader& s_phong
     t_specular.use(s_phong, "material.specular", 1);
     s_phong.set("material.shininess", 32);
 
-    floor.render();
+    glStencilMask(0x00);
+    //suelo
+    quad.render();
 
-    model = glm::mat4(1.0f);
-    s_phong.set("model", model);
 
-    normalMat = glm::inverse(glm::transpose(glm::mat3(model)));
-    s_phong.set("normalMat", normalMat);
+    glStencilMask(0xff);
+    glStencilFunc(GL_ALWAYS, 1, 0xff);
 
-    object.render();
+    renderNormalQuad(quad, s_phong, normalQuad);
 
-    s_blend.use();
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(0.0f, 0.0f, 2.0f));
-    s_blend.set("model", model);
-    s_blend.set("view", view);
-    s_blend.set("proj", proj);
+    s_stencil.use();
+    s_stencil.set("view", view);
+    s_stencil.set("proj", proj);
 
-    t_tree.use(s_blend, "texture1", 0);
-
-    floor.render();
+    for (uint32_t i = 0; i < colorQuadPositions->length(); i++)
+    {
+        renderColorQuad(quad, s_stencil, quadColors[i], colorQuadPositions[i]);
+    }
 }
 
 int main(int, char* []) {
@@ -122,10 +157,9 @@ int main(int, char* []) {
     glClearColor(0.0f, 0.3f, 0.6f, 1.0f);
 
     const Shader s_phong("../projects/EJ11_03/phong.vs", "../projects/EJ11_03/blinn.fs");
-    const Shader s_blend("../projects/EJ11_03/blend.vs", "../projects/EJ11_03/blend.fs");
+    const Shader s_stencil("../projects/EJ11_03/stencil.vs", "../projects/EJ11_03/stencil.fs");
     const Texture t_albedo("../assets/textures/bricks_albedo.png", Texture::Format::RGB);
     const Texture t_specular("../assets/textures/bricks_specular.png", Texture::Format::RGB);
-    const Texture t_tree("../assets/textures/tree.png", Texture::Format::RGBA);
     const Cube cube(1.0f);
     const Quad quad(1.0f);
 
@@ -134,6 +168,10 @@ int main(int, char* []) {
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_NOTEQUAL, 1, 0xff);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -148,7 +186,7 @@ int main(int, char* []) {
         lastFrame = currentFrame;
 
         handleInput(deltaTime);
-        render(quad, cube, s_phong, s_blend, t_albedo, t_specular, t_tree);
+        render(quad, cube, s_phong, s_stencil, t_albedo, t_specular);
         window->frame();
     }
 

@@ -11,13 +11,13 @@
 #include "engine/geometry/sphere.hpp"
 #include "engine/geometry/quad.hpp"
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 2.0f, 10.0f));
 glm::vec3 lightPos(4.0f, 1.0f, 0.0f);
 
 glm::vec3 cubePositions[] = {
-    glm::vec3(0.0f, 0.0f, 4.0f),
+    glm::vec3(4.0f, 0.0f, 0.0f),
     glm::vec3(0.0f, 0.0f, 0.0f),
-    glm::vec3(0.0f, 0.0f, -4.0f)
+    glm::vec3(-4.0f, 0.0f, 0.0f)
 };
 
 float lastFrame = 0.0f;
@@ -70,8 +70,8 @@ void onScrollMoved(float x, float y) {
     camera.handleMouseScroll(y);
 }
 
-void render(const Geometry& floor, const Geometry& object, const Shader& s_phong,
-    const Texture& t_albedo, const Texture& t_specular) {
+void render(const Geometry& floor, const Geometry& object, const Shader& s_phong,const Shader& s_blend,
+    const Texture& t_albedo, const Texture& t_specular, const Texture& t_wood, const Texture& t_grass) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glm::mat4 view = camera.getViewMatrix();
@@ -109,9 +109,25 @@ void render(const Geometry& floor, const Geometry& object, const Shader& s_phong
 
         glm::mat3 normalMat = glm::inverse(glm::transpose(glm::mat3(model)));
         s_phong.set("normalMat", normalMat);
+        t_wood.use(s_phong, "material.diffuse", 0);
 
         object.render();
     }
+
+    s_blend.use();
+    for (const auto& cubePos : cubePositions) {
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, cubePos + glm::vec3(0.0f, 0.0f, 1.0f));
+        
+        s_blend.set("model", model);
+        s_blend.set("view", view);
+        s_blend.set("proj", proj);
+
+        t_grass.use(s_blend, "tex", 0);
+
+        floor.render();
+    }
+
 }
 
 int main(int, char* []) {
@@ -120,6 +136,9 @@ int main(int, char* []) {
     glClearColor(0.0f, 0.3f, 0.6f, 1.0f);
 
     const Shader s_phong("../projects/EJ11_01/phong.vs", "../projects/EJ11_01/blinn.fs");
+    const Shader s_blend("../projects/EJ11_01/blend.vs", "../projects/EJ11_01/blend.fs");
+    const Texture t_wood("../assets/textures/wood.jpg", Texture::Format::RGB);
+    const Texture t_grass("../assets/textures/grass.png", Texture::Format::RGBA);
     const Texture t_albedo("../assets/textures/bricks_albedo.png", Texture::Format::RGB);
     const Texture t_specular("../assets/textures/bricks_specular.png", Texture::Format::RGB);
     const Cube cube(1.0f);
@@ -131,6 +150,9 @@ int main(int, char* []) {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     Input::instance()->setKeyPressedCallback(onKeyPress);
     Input::instance()->setMouseMoveCallback(onMouseMoved);
     Input::instance()->setScrollMoveCallback(onScrollMoved);
@@ -141,7 +163,7 @@ int main(int, char* []) {
         lastFrame = currentFrame;
 
         handleInput(deltaTime);
-        render(quad, cube, s_phong, t_albedo, t_specular);
+        render(quad, cube, s_phong, s_blend, t_albedo, t_specular, t_wood, t_grass);
         window->frame();
     }
 

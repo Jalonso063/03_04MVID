@@ -11,13 +11,21 @@
 #include "engine/geometry/sphere.hpp"
 #include "engine/geometry/quad.hpp"
 
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 2.0f, 10.0f));
 glm::vec3 lightPos(4.0f, 1.0f, 0.0f);
 
-glm::vec3 cubePositions[] = {
-    glm::vec3(0.0f, 0.0f, 4.0f),
+glm::vec3 normalQuad(0.0f, 0.0f, 4.0f);
+
+glm::vec3 colorQuadPositions[] = {    
+    glm::vec3(0.0f, 0.0f, 2.0f),
     glm::vec3(0.0f, 0.0f, 0.0f),
-    glm::vec3(0.0f, 0.0f, -4.0f)
+    glm::vec3(0.0f, 0.0f, -2.0f)
+};
+
+glm::vec4 quadColors[] = {
+    glm::vec4(0.0f, 0.0f, 1.0f, 0.6f),
+    glm::vec4(0.0f, 1.0f, 0.0f, 0.4f),
+    glm::vec4(1.0f, 0.0f, 0.0f, 0.2f)
 };
 
 float lastFrame = 0.0f;
@@ -70,7 +78,30 @@ void onScrollMoved(float x, float y) {
     camera.handleMouseScroll(y);
 }
 
-void render(const Geometry& floor, const Geometry& object, const Shader& s_phong, const Shader& s_stencil,
+void renderNormalQuad(const Geometry& quad, const Shader& s_phong, const glm::vec3& quadPos)
+{
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, quadPos);
+    s_phong.set("model", model);
+
+    glm::mat3 normalMat = glm::inverse(glm::transpose(glm::mat3(model)));
+    s_phong.set("normalMat", normalMat);
+
+    quad.render();
+}
+
+void renderColorQuad(const Geometry& quad, const Shader& s_stencil, const glm::vec4& quadColor, const glm::vec3& quadPos)
+{
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, quadPos);
+
+    s_stencil.set("model", model);
+    s_stencil.set("color", quadColor);
+
+    quad.render();
+}
+
+void render(const Geometry& quad, const Geometry& object, const Shader& s_phong, const Shader& s_stencil,
     const Texture& t_albedo, const Texture& t_specular) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
@@ -101,47 +132,23 @@ void render(const Geometry& floor, const Geometry& object, const Shader& s_phong
     s_phong.set("material.shininess", 32);
 
     glStencilMask(0x00);
+    //suelo
+    quad.render();
 
-    floor.render();
-
-//------------ FIRST PASS
 
     glStencilMask(0xff);
     glStencilFunc(GL_ALWAYS, 1, 0xff);
 
-    for (const auto& cubePos : cubePositions) {
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, cubePos);
-        s_phong.set("model", model);
-
-        glm::mat3 normalMat = glm::inverse(glm::transpose(glm::mat3(model)));
-        s_phong.set("normalMat", normalMat);
-
-        object.render();
-    }
-
-//------------ SECOND PASS
-
-    glStencilMask(0x00);
-    glStencilFunc(GL_NOTEQUAL, 1, 0xff);
-    glDisable(GL_DEPTH_TEST);
+    renderNormalQuad(quad, s_phong, normalQuad);
 
     s_stencil.use();
     s_stencil.set("view", view);
     s_stencil.set("proj", proj);
-    s_stencil.set("color", 0.7f, 0.7f, 0.7f, 0.6f);  
 
-    for (const auto& cubePos : cubePositions) {
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, cubePos);
-        model = glm::scale(model, glm::vec3(1.1f, 1.1f, 1.1f));
-        s_stencil.set("model", model);
-
-        object.render();
+    for (uint32_t i = 0; i < colorQuadPositions->length(); i++)
+    {
+        renderColorQuad(quad, s_stencil, quadColors[i], colorQuadPositions[i]);
     }
-
-    glStencilMask(0xff);
-    glEnable(GL_DEPTH_TEST);
 }
 
 int main(int, char* []) {
