@@ -1,6 +1,6 @@
 # Actividad 05
 
-## Fecha Entrega, Conv1 = 26/01/20, Conv2 = 21/02/20
+## Fecha Entrega, Conv1 = 26/01/20, Conv2 = 28/02/20
 
 ## EJ12
 

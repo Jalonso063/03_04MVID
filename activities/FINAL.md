@@ -1,6 +1,6 @@
 # Actividad Final
 
-## Fecha Entrega, Conv1 = 09/02/20, Conv2 = 21/02/20
+## Fecha Entrega, Conv1 = 16/02/20, Conv2 = 28/02/20
 
 Se debe usar el motor desarrollado durante las clases, y será necesario ampliarlo como se ha mostrado en la segunda parte de la asignatura (grafo de escena, main loop, ...).
 
