@@ -18,6 +18,8 @@ include(cmake/compiler.cmake)
 set(ENGINE_SRC_FILES
     ${CMAKE_CURRENT_LIST_DIR}/src/engine/camera.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/engine/deps.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/engine/fbo.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/engine/shadow.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/engine/mesh.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/engine/model.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/engine/shader.cpp
@@ -32,6 +34,8 @@ set(ENGINE_SRC_FILES
 set(ENGINE_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/camera.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/input.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/engine/fbo.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/engine/shadow.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/mesh.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/model.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/shader.hpp

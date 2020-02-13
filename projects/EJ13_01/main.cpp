@@ -11,6 +11,7 @@
 #include "engine/geometry/sphere.hpp"
 #include "engine/geometry/quad.hpp"
 #include <iostream>
+#include <engine\fbo.hpp>
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 
@@ -96,7 +97,7 @@ std::tuple<uint32_t, uint32_t, uint32_t> createFBO() {
 }
 
 void render(const Geometry& quad, const Geometry& cube, const Shader& s_phong, const Shader& s_fbo,
-    const Texture& t_albedo, const Texture& t_specular, const uint32_t fbo, const uint32_t fbo_texture) {
+    const Texture& t_albedo, const Texture& t_specular, const Fbo& fbo) {
     glm::mat4 view = camera.getViewMatrix();
     glm::mat4 proj = glm::perspective(glm::radians(camera.getFOV()), static_cast<float>(Window::instance()->getWidth()) / Window::instance()->getHeight(), 0.1f, 100.0f);
 
@@ -104,10 +105,11 @@ void render(const Geometry& quad, const Geometry& cube, const Shader& s_phong, c
     glm::mat4 secProj = glm::perspective(glm::radians(45.0f), static_cast<float>(Window::instance()->getWidth()) / Window::instance()->getHeight(), 0.1f, 100.0f);
 
     //FIRST PASS
-    glEnable(GL_DEPTH_TEST);
+    /*glEnable(GL_DEPTH_TEST);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);*/
+    fbo.render();
 
     s_phong.use();
     s_phong.set("view", secView);
@@ -173,11 +175,12 @@ void render(const Geometry& quad, const Geometry& cube, const Shader& s_phong, c
     cube.render();
 
 
-    s_fbo.use();
+    /*s_fbo.use();
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, fbo_texture);
-    s_fbo.set("screenTexture", 0);
+    s_fbo.set("screenTexture", 0);*/
+    fbo.bindTexture(s_fbo);
 
     quad.render();
 }
@@ -194,7 +197,9 @@ int main(int, char* []) {
     const Quad quad(2.0f);
     const Cube cube(1.0f);
 
-    auto fbo = createFBO();
+    Fbo fbo = Fbo::Fbo();
+
+    //auto fbo = createFBO();
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
@@ -209,13 +214,15 @@ int main(int, char* []) {
         lastFrame = currentFrame;
 
         handleInput(deltaTime);
-        render(quad, cube, s_phong, s_fbo, t_albedo, t_specular, std::get<0>(fbo), std::get<1>(fbo));
+        //render(quad, cube, s_phong, s_fbo, t_albedo, t_specular, std::get<0>(fbo), std::get<1>(fbo));
+        render(quad, cube, s_phong, s_fbo, t_albedo, t_specular, fbo);
         window->frame();
     }
 
-    glDeleteFramebuffers(1, &std::get<0>(fbo));
+    fbo.~Fbo();
+    /*glDeleteFramebuffers(1, &std::get<0>(fbo));
     glDeleteTextures(1, &std::get<1>(fbo));
-    glDeleteRenderbuffers(1, &std::get<2>(fbo));
+    glDeleteRenderbuffers(1, &std::get<2>(fbo));*/
 
     return 0;
 }

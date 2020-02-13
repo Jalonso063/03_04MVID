@@ -11,6 +11,7 @@
 #include "engine/geometry/sphere.hpp"
 #include "engine/geometry/quad.hpp"
 #include <iostream>
+#include "../../build/shadow.h"
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 glm::vec3 lightPos(1.2f, 4.0f, 3.0f);
@@ -130,13 +131,15 @@ const Texture& t_albedo, const Texture& t_specular) {
 
 void render(const Geometry& quad, const Geometry& cube, const Geometry& sphere,
     const Shader& s_phong, const Shader& s_depth, const Shader& s_debug, const Shader& s_light,
-    const Texture& t_albedo, const Texture& t_specular, const uint32_t fbo, const uint32_t fbo_texture) {
+    const Texture& t_albedo, const Texture& t_specular, const uint32_t fbo, const uint32_t fbo_texture, Shadow shadow) {
 
 //FIRST PASS
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    /*glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glViewport(0, 0, k_shadow_width, k_shadow_height);
     glClear(GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);*/
+
+    shadow.render();
 
     const glm::mat4 lightProjection = glm::perspective(glm::radians(45.0f), static_cast<float>(Window::instance()->getWidth()) / Window::instance()->getHeight(), k_shadow_near, k_shadow_far);
     const glm::mat4 lightView = glm::lookAt(lightPos, lightDir, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -191,9 +194,10 @@ void render(const Geometry& quad, const Geometry& cube, const Geometry& sphere,
 
     s_phong.set("lightSpaceMatrix", lightSpaceMatrix);
 
-    glActiveTexture(GL_TEXTURE2);
+    /*glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, fbo_texture);
-    s_phong.set("depthMap", 2);
+    s_phong.set("depthMap", 2);*/
+    shadow.bindTexture(s_phong);
 
     renderScene(s_phong, quad, cube, sphere, t_albedo, t_specular);
 
@@ -227,6 +231,8 @@ int main(int, char* []) {
 
     auto fbo = createFBO();
 
+    Shadow shadow = Shadow::Shadow();
+
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
@@ -240,12 +246,14 @@ int main(int, char* []) {
         lastFrame = currentFrame;
 
         handleInput(deltaTime);
-        render(quad, cube, sphere, s_phong, s_depth, s_debug, s_light, t_albedo, t_specular, fbo.first, fbo.second);
+        render(quad, cube, sphere, s_phong, s_depth, s_debug, s_light, t_albedo, t_specular, fbo.first, fbo.second, shadow);
         window->frame();
     }
 
-    glDeleteFramebuffers(1, &fbo.first);
-    glDeleteTextures(1, &fbo.second);
+    shadow.~Shadow();
+
+    //glDeleteFramebuffers(1, &fbo.first);
+    //glDeleteTextures(1, &fbo.second);
 
     return 0;
 }
