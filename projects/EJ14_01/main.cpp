@@ -11,7 +11,7 @@
 #include "engine/geometry/sphere.hpp"
 #include "engine/geometry/quad.hpp"
 #include <iostream>
-#include "../../build/shadow.h"
+#include <engine\shadow.hpp>
 
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 glm::vec3 lightPos(1.2f, 4.0f, 3.0f);

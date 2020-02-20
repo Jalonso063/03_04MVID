@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __SHADOW_H__
+#define __SHADOW_H__
 #include <engine\shader.hpp>
 
 class Shadow
@@ -15,4 +16,6 @@ private:
     uint32_t _fbo = 0;
     uint32_t _depthMap = 0;
 };
+
+#endif
 

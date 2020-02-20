@@ -1,6 +1,6 @@
-#include "shadow.h"
 #include <glad\glad.h>
 #include <iostream>
+#include <engine\shadow.hpp>
 
 Shadow::Shadow()
 {

@@ -6,7 +6,7 @@
 
 class Sphere final : public Geometry {
     public:
-        Sphere() = delete;
+        Sphere() = default;
         Sphere(float radius, uint32_t stacks, uint32_t slices);
 
     private:

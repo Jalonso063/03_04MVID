@@ -29,7 +29,13 @@ set(ENGINE_SRC_FILES
     ${CMAKE_CURRENT_LIST_DIR}/src/engine/geometry/geometry.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/engine/geometry/quad.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/engine/geometry/sphere.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/src/engine/geometry/teapot.cpp)
+    ${CMAKE_CURRENT_LIST_DIR}/src/engine/geometry/teapot.cpp
+    #${CMAKE_CURRENT_LIST_DIR}/src/engine/game/game.cpp
+    #${CMAKE_CURRENT_LIST_DIR}/src/engine/game/entity.cpp
+    #${CMAKE_CURRENT_LIST_DIR}/src/engine/game/ball.cpp
+    #${CMAKE_CURRENT_LIST_DIR}/src/engine/game/blockList.cpp
+    #${CMAKE_CURRENT_LIST_DIR}/src/engine/game/paddle.cpp
+    #${CMAKE_CURRENT_LIST_DIR}/src/engine/game/frame.cpp)
 
 set(ENGINE_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/camera.hpp
@@ -37,7 +43,7 @@ set(ENGINE_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/fbo.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/shadow.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/mesh.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/include/engine/model.hpp
+    ${CMAKE_CURRENT_LIST_DIR}/include/engine/model.hpp    
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/shader.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/texture.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/window.hpp
@@ -46,12 +52,18 @@ set(ENGINE_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/geometry/quad.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/geometry/sphere.hpp
     ${CMAKE_CURRENT_LIST_DIR}/include/engine/geometry/teapot.hpp
-    ${CMAKE_CURRENT_LIST_DIR}/include/engine/geometry/teapotdata.hpp)
+    ${CMAKE_CURRENT_LIST_DIR}/include/engine/geometry/teapotdata.hpp
+    #${CMAKE_CURRENT_LIST_DIR}/include/engine/game/game.hpp
+    #${CMAKE_CURRENT_LIST_DIR}/include/engine/game/entity.hpp
+    #${CMAKE_CURRENT_LIST_DIR}/include/engine/game/ball.hpp
+    #${CMAKE_CURRENT_LIST_DIR}/include/engine/game/blockList.hpp
+    #${CMAKE_CURRENT_LIST_DIR}/include/engine/game/paddle.hpp
+    #${CMAKE_CURRENT_LIST_DIR}/include/engine/game/frame.hpp)
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/src/engine/ PREFIX "Source Files" FILES ${ENGINE_SRC_FILES})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/include/engine PREFIX "Header Files" FILES ${ENGINE_HEADER_FILES})
 
-add_library(EngineLib STATIC ${ENGINE_SRC_FILES} ${ENGINE_HEADER_FILES} ${DEPS_SRC_FILES_COMMON})
+add_library(EngineLib STATIC ${ENGINE_SRC_FILES} ${ENGINE_HEADER_FILES} ${DEPS_SRC_FILES_COMMON} ${GAME_SRC_FILES} ${GAME_HEADER_FILES})
 
 target_include_directories(EngineLib PRIVATE ${INCLUDE_PATHS})
 target_link_libraries(EngineLib PRIVATE

@@ -6,8 +6,7 @@
 class Cube final : public Geometry {
     public:
         Cube() = delete;
-        explicit Cube(float size);
-        explicit Cube(float width, float height);
+        explicit Cube(float size);      
 
     private:
         float _size;

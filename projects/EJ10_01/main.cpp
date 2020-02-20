@@ -121,7 +121,7 @@ void render(const Model& object, const Geometry& light, const Shader& s_phong, c
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
     //model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    model = glm::scale(model, glm::vec3(0.02));
+    model = glm::scale(model, glm::vec3(1.5f));
     s_phong.set("model", model);
     s_phong.set("view", view);
     s_phong.set("proj", proj);
@@ -139,7 +139,8 @@ int main(int, char* []) {
 
     const Shader s_phong("../projects/EJ10_01/phong.vs", "../projects/EJ10_01/blinn.fs");
     const Shader s_light("../projects/EJ10_01/light.vs", "../projects/EJ10_01/light.fs");
-    const Model object("../assets/models/lantern/lantern_obj.obj");
+    //const Model object("../assets/models/lantern/lantern_obj.obj");
+    const Model object("../assets/models/plate/plate.obj");
 
     const Sphere sphere(1.0f, 50, 50);
 
